@@ -1,0 +1,48 @@
+{% extends 'app/header.html' %}
+
+{% block title %}Actualizar Profesional{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h2 class="text-center mb-4">Actualizar Profesional</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label for="nombre" class="form-label">Nombre:</label>
+                        <input type="text" id="nombre" name="nombre" class="form-control" value="{{ profesional.nombre }}" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="apellido" class="form-label">Apellido:</label>
+                        <input type="text" id="apellido" name="apellido" class="form-control" value="{{ profesional.apellido }}" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="profesion" class="form-label">Profesión:</label>
+                        <select id="profesion" name="profesion" class="form-select" required>
+                            {% for servicio in profesiones %}
+                                <option value="{{ servicio.id }}" {% if profesional.profesion.id == servicio.id %}selected{% endif %}>
+                                    {{ servicio.nombre }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="email" class="form-label">Email:</label>
+                        <input type="email" id="email" name="email" class="form-control" value="{{ profesional.email }}" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="telefono" class="form-label">Teléfono:</label>
+                        <input type="tel" id="telefono" name="telefono" class="form-control" value="{{ profesional.telefono }}" required>
+                    </div>
+                    <div class="form-actions text-center">
+                        <button type="submit" class="btn btn-primary">Actualizar</button>
+                        <a href="{% url 'gestionar_profesionales' %}" class="btn btn-secondary ms-2">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <br>
+    </div>
+{% endblock %}
+{% include 'app/footer.html' %}

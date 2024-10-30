@@ -1,0 +1,41 @@
+{% extends 'app/header.html' %}
+{% load static %}
+
+{% block content %}
+
+<section class="hero-section">
+  <div class="hero-content">
+    <h1>ServiceMatch<br>Servicios locales a un click</h1>
+    <p>Conectamos a los usuarios con profesionales confiables en tu área, facilitando la búsqueda y la reserva de los servicios que necesitas.</p>
+    <a href="{% url 'crear_reserva' %}" class="btn-primary">Reserva ahora</a>
+  </div>
+</section>
+
+<!-- Solutions for every corner (Services) -->
+<section class="services-section">
+	<div class="services-intro">
+	  <h2>Servicios para todos</h2>
+	  <p>Tu solución para reservar servicios de plomería, jardinería, limpieza y reparaciones menores de manera rápida y sencilla.</p>
+	  <a href="#" class="btn-discover">Descubre más</a>
+	</div>
+	<div class="services-container">
+	  <div class="service-card" style="background-image: url('static/images/plomeria (2).jpg');">
+		<h3>Plomería</h3>
+		<p>Servicios de plomería para instalar, reparar y mantener grifos, tuberías y sistemas de desagüe.</p>
+	  </div>
+	  <div class="service-card" style="background-image: url('static/images/jardineria.jpg');">
+		<h3>Jardinería</h3>
+		<p>Cuidado y mantenimiento de jardines, incluyendo diseño, poda y cuidado de plantas.</p>
+	  </div>
+	  <div class="service-card" style="background-image: url('static/images/limpieza.jpg');">
+		<h3>Limpieza</h3>
+		<p>Servicios de limpieza profunda y mantenimiento regular para hogares y oficinas.</p>
+	  </div>
+	  <div class="service-card" style="background-image: url('static/images/repairs.jpg');">
+		<h3>Reparaciones menores</h3>
+		<p>Arreglos simples y mejoras en el hogar, desde trabajos eléctricos hasta pequeñas reparaciones.</p>
+	  </div>
+	</div>
+</section>
+{% endblock %}
+{% include 'app/footer.html' %}

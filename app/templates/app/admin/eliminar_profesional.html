@@ -1,0 +1,18 @@
+{% extends 'app/header.html' %}
+{% block title %}Eliminar Profesional{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h2 class="text-center">¿Estás seguro que deseas eliminar a este profesional?</h2>
+        <p class="text-center">Nombre: {{ profesional.nombre }} {{ profesional.apellido }}</p>
+        <p class="text-center">Profesión: {{ profesional.profesion.nombre }}</p>
+
+        <div class="text-center">
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Eliminar</button>
+                <a href="{% url 'gestionar_profesionales' %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+{% endblock %}

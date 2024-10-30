@@ -1,0 +1,46 @@
+.filter-container {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    margin-bottom: 20px;
+    max-width: 300px;
+}
+
+.filter-container h3 {
+    margin-bottom: 10px;
+    color: #333333;
+    font-weight: bold;
+}
+
+.filter-container label {
+    font-size: 14px;
+    color: #555;
+}
+
+.filter-container input {
+    padding: 10px;
+    margin: 5px 0 15px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 100%;
+    font-size: 14px;
+}
+
+.filter-container button {
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+}
+
+.filter-container button:hover {
+    background-color: #0056b3;
+}

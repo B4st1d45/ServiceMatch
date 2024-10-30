@@ -1,0 +1,32 @@
+{% extends 'app/header.html' %}
+
+{% block title %}Actualizar Servicio{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Actualizar Servicio</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group mb-3">
+                <label for="nombre" class="form-label">Nombre del Servicio:</label>
+                <input type="text" id="nombre" name="nombre" class="form-control" value="{{ profesion.nombre }}" required>
+            </div>
+            <div class="form-group mb-3">
+                <label for="descripcion" class="form-label">Descripción:</label>
+                <input type="text" id="descripcion" name="descripcion" class="form-control" value="{{ profesion.descripcion }}" required>
+            </div>
+            <div class="form-group mb-3">
+                <label for="tarifa" class="form-label">Tarifa (desde):</label>
+                <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" id="tarifa" name="tarifa" class="form-control" required>
+                </div>
+            </div>
+            <div class="form-actions text-center">
+                <button type="submit" class="btn btn-primary">Actualizar</button>
+                <a href="{% url 'gestionar_profesion' %}" class="btn btn-secondary ms-2">Cancelar</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+{% include 'app/footer.html' %}

@@ -1,0 +1,67 @@
+{% extends 'app/header.html' %}
+
+{% block content %}
+<h2>Crear Reserva</h2>
+
+<form action="{% url 'crear_reserva' %}" method="POST">
+    {% csrf_token %}
+    
+    <div class="form-group">
+        <label for="servicio">Selecciona un servicio:</label>
+        <select name="servicio" id="servicio" required class="form-control" onchange="filtrarProfesionales()">
+            <option value="">Selecciona un servicio</option>
+            {% for servicio in servicios %}
+                <option value="{{ servicio.id }}">{{ servicio.nombre }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="profesional">Selecciona un profesional:</label>
+        <select name="profesional" id="profesional" required class="form-control">
+            <option value="">Primero selecciona un servicio</option>
+            {% for profesional in profesionales %}
+                <option value="{{ profesional.id }}" data-servicios="{{ profesional.servicios|join:', ' }}">{{ profesional.nombre }} {{ profesional.apellido }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label for="fecha">Selecciona una fecha:</label>
+        <input type="datetime-local" name="fecha" id="fecha" required class="form-control">
+    </div>
+    
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Hacer Reserva</button>
+        <a href="#" class="btn btn-secondary">Ver mis reservas</a>
+    </div>
+</form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const servicioSelect = document.getElementById('servicio');
+        const profesionalSelect = document.getElementById('profesional');
+    
+        servicioSelect.addEventListener('change', function() {
+            const servicioId = this.value;
+            
+            // Realiza la solicitud AJAX para obtener los profesionales del servicio seleccionado
+            fetch(`/obtener_profesionales_por_servicio/${servicioId}/`)
+                .then(response => response.json())
+                .then(profesionales => {
+                    // Limpia las opciones actuales
+                    profesionalSelect.innerHTML = '';
+    
+                    // Añade una opción por cada profesional filtrado
+                    profesionales.forEach(profesional => {
+                        const option = document.createElement('option');
+                        option.value = profesional.id;
+                        option.textContent = `${profesional.nombre} ${profesional.apellido}`;
+                        profesionalSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error al cargar profesionales:', error));
+        });
+    });
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+{% endblock %}

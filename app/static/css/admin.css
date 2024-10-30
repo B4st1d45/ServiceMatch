@@ -1,0 +1,48 @@
+.admin-home-container {
+    text-align: center;
+    padding: 50px;
+    background-color: #f9f9f9; /* Un fondo claro */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 50px auto;
+    max-width: 600px;
+}
+
+.admin-buttons {
+    margin-top: 30px;
+}
+
+.admin-buttons a {
+    display: inline-block;
+    margin: 10px;
+    padding: 15px 30px;
+    background-color: #007bff; /* Color azul clásico de Bootstrap */
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.admin-buttons a:hover {
+    background-color: #0056b3;
+}
+
+/* reportes */
+.table-container {
+    margin-top: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+}
+
+th {
+    background-color: #007bff;
+    color: white;
+}
