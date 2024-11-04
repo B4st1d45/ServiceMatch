@@ -2,7 +2,7 @@
     display: flex;
     justify-content: space-between;
     padding: 60px 20px;
-    background-color: #f9f9f9;
+    background-color: #E9E3FF;
 }
 
 .services-intro {
@@ -16,19 +16,19 @@
 .services-intro h2 {
     font-size: 32px;
     font-weight: 600;
-    color: #333;
+    color: #431F32;
 }
 
 .services-intro p {
     font-size: 16px;
-    color: #777;
+    color: #431F32;
     margin: 20px 0;
 }
 
 .services-intro .btn-discover {
     padding: 10px 20px;
-    background-color: #f4a261;
-    color: #fff;
+    background-color: #630D3B;
+    color: #E9E3FF;
     text-decoration: none;
     border-radius: 5px;
 }
@@ -52,7 +52,7 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    color: #A1A6A5;
+    color: #C5C9E0;
     padding: 20px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     text-align: left;
@@ -73,12 +73,12 @@
 .service-card h3 {
     font-size: 20px;
     margin-bottom: 10px;
-    color: #ffffff;
+    color: #E9E3FF;
 }
 
 .service-card p {
     font-size: 14px;
-    color: #ffffff;
+    color: #E9E3FF;
 }
 
 .service-card h3, .service-card p {

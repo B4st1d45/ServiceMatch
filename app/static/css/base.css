@@ -20,37 +20,37 @@ main {
 /* Links */
 a {
     text-decoration: none;
-    color: #007bff;
+    color: #630D3B;
 }
 
 a:hover {
-    color: #0056b3;
+    color: #630D3B;
 }
 
 /* Botones */
 .btn-primary {
     padding: 10px 20px;
-    background-color: #f4a261;
+    background-color: #878AA6;
     color: white;
     text-decoration: none;
     border-radius: 5px;
 }
 
 .btn-primary:hover {
-    background-color: #0056b3;
+    background-color: #630D3B;
 }
 
 /* Formularios */
 .form-group input, .form-control {
     width: 100%;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #E9E3FF;
     border-radius: 5px;
     font-size: 16px;
 }
 
 .form-control:focus {
-    border-color: #007bff;
+    border-color: #630D3B;
     outline: none;
 }
 

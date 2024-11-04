@@ -1,48 +1,142 @@
-.admin-home-container {
-    text-align: center;
-    padding: 50px;
-    background-color: #f9f9f9; /* Un fondo claro */
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin: 50px auto;
-    max-width: 600px;
+/* Archivo: admin.css */
+.admin-dashboard {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    font-family: Arial, sans-serif;
 }
 
-.admin-buttons {
-    margin-top: 30px;
+.sidebar {
+    width: 250px;
+    background-color: #E9E3FF;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.admin-buttons a {
-    display: inline-block;
-    margin: 10px;
-    padding: 15px 30px;
-    background-color: #007bff; /* Color azul clásico de Bootstrap */
-    color: white;
+.sidebar h2 {
+    font-size: 18px;
+    color: #431F32;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-sidebar {
+    display: block;
+    padding: 10px;
+    margin: 10px 0;
     text-decoration: none;
-    font-size: 16px;
+    color: #630D3B;
+    border: 1px solid #630D3B;
     border-radius: 5px;
-    transition: background-color 0.3s ease;
+    text-align: center;
+    transition: all 0.3s ease;
 }
 
-.admin-buttons a:hover {
-    background-color: #0056b3;
+.btn-sidebar:hover {
+    background-color: #630D3B;
+    color:#E9E3FF;
 }
 
-/* reportes */
-.table-container {
-    margin-top: 20px;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #E9E3FF;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #ffffff;
+.main-content h3 {
+    font-size: 22px;
+    color: #431F32;
+    margin-bottom: 20px;
 }
 
-th {
-    background-color: #007bff;
-    color: white;
+.chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: #E9E3FF;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
+canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+.panel-btn {
+    list-style-type: none;
+    padding: 0;
+}
+
+.date-picker {
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border: 1px solid #630D3B;
+    border-radius: 5px;
+    background-color: #F5F1FF; /* Un tono claro para combinar con el fondo */
+    color: #431F32;
+    font-size: 14px;
+    outline: none;
+    gap: 20px;
+    transition: border-color 0.3s ease;
+}
+
+.date-picker:hover,
+.date-picker:focus {
+    border-color: #431F32;
+}
+
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: minmax(100px, auto);
+    gap: 20px;
+}
+
+.card-container-gains {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: minmax(100px, auto);
+    gap: 20px;
+}
+
+.card {
+    background-color: #F5F1FF;
+    border: 1px solid #D3C5FF;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card h4 {
+    font-size: 16px;
+    color: #431F32;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card p {
+    font-size: 24px;
+    color: #630D3B;
+    margin: 5px 0;
+}
+
+.card small {
+    font-size: 12px;
+    color: #7A667C;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+

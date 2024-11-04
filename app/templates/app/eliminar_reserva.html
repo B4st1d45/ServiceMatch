@@ -1,0 +1,15 @@
+{% extends 'app/header.html' %}
+
+{% block title %}Eliminar Reserva{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Eliminar Reserva</h1>
+    <p>¿Estás seguro de que deseas eliminar la reserva para <strong>{{ reserva.servicio.nombre }}</strong> con <strong>{{ reserva.profesional.nombre }} {{ reserva.profesional.apellido }}</strong> el <strong>{{ reserva.fecha|date:"d M Y H:i" }}</strong>?</p>
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <a href="{% url 'ver_mis_reservas' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

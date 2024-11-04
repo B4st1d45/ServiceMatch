@@ -1,7 +1,7 @@
 /* Header y Navbar */
 .logo {
     font-family: 'Blanka';
-    color: #A1A6A5;
+    color: #E9E3FF;
     font-size: 24px;
     text-decoration: none;
     display: inline-block;
@@ -9,7 +9,7 @@
 }
 
 .logo:hover {
-    color: #A68072;
+    color: #878AA6;
 }
 
 .navbar {
@@ -17,7 +17,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #0D0D0D;
+    background-color: #431F32;
     position: relative;
     z-index: 1000;
 }
@@ -40,22 +40,22 @@
 
 .nav-links li a {
     text-decoration: none;
-    color: #A1A6A5;
+    color: #E9E3FF;
     font-weight: 500;
     font-size: 16px;
     padding: 5px 10px;
 }
 
 .nav-links li a:hover {
-    color: #A68072;
+    color: #878AA6;
 }
 
 .menu-icon {
     display: none;
     font-size: 24px;
-    color: #A1A6A5;
+    color: #E9E3FF;
 }
 
 .menu-icon:hover {
-    color: #A68072;
+    color: #878AA6;
 }

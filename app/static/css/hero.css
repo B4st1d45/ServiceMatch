@@ -14,8 +14,8 @@
 
 .hero-content .btn-primary {
     padding: 10px 20px;
-    background-color: #f4a261;
-    color: #fff;
+    background-color: #630D3B;
+    color: #E9E3FF;
     text-decoration: none;
     font-size: 16px;
     border-radius: 5px;
@@ -29,7 +29,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white;
+    color: #E9E3FF;
     text-align: center;
     position: relative;
     overflow: hidden; 

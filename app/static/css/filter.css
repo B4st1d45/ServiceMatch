@@ -11,19 +11,19 @@
 
 .filter-container h3 {
     margin-bottom: 10px;
-    color: #333333;
+    color: #878AA6;
     font-weight: bold;
 }
 
 .filter-container label {
     font-size: 14px;
-    color: #555;
+    color: #878AA6;
 }
 
 .filter-container input {
     padding: 10px;
     margin: 5px 0 15px 0;
-    border: 1px solid #ddd;
+    border: 1px solid #E9E3FF;
     border-radius: 8px;
     width: 100%;
     font-size: 14px;
@@ -31,7 +31,7 @@
 
 .filter-container button {
     padding: 10px;
-    background-color: #007bff;
+    background-color: #630D3B;
     color: #fff;
     border: none;
     border-radius: 8px;
@@ -42,5 +42,5 @@
 }
 
 .filter-container button:hover {
-    background-color: #0056b3;
+    background-color: #630D3B;
 }

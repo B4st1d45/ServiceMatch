@@ -1,67 +1,88 @@
 {% extends 'app/header.html' %}
 
 {% block content %}
-<h2>Crear Reserva</h2>
+<div class="container">
+    <h1>Crear Reserva</h1>
 
-<form action="{% url 'crear_reserva' %}" method="POST">
-    {% csrf_token %}
-    
-    <div class="form-group">
-        <label for="servicio">Selecciona un servicio:</label>
-        <select name="servicio" id="servicio" required class="form-control" onchange="filtrarProfesionales()">
-            <option value="">Selecciona un servicio</option>
+    <form method="POST" action="{% url 'crear_reserva' %}">
+        {% csrf_token %}
+
+        <!-- Selección de Servicio -->
+        <label for="servicio">Selecciona el Servicio:</label>
+        <select id="servicio" name="servicio" required onchange="filtrarSubcategorias()">
+            <option value="" disabled selected>Elige un servicio</option>
             {% for servicio in servicios %}
                 <option value="{{ servicio.id }}">{{ servicio.nombre }}</option>
             {% endfor %}
         </select>
-    </div>
 
-    <div class="form-group">
-        <label for="profesional">Selecciona un profesional:</label>
-        <select name="profesional" id="profesional" required class="form-control">
-            <option value="">Primero selecciona un servicio</option>
-            {% for profesional in profesionales %}
-                <option value="{{ profesional.id }}" data-servicios="{{ profesional.servicios|join:', ' }}">{{ profesional.nombre }} {{ profesional.apellido }}</option>
-            {% endfor %}
+        <!-- Selección de Subcategoría -->
+        <label for="subcategoria">Selecciona el Tipo de Servicio:</label>
+        <select id="subcategoria" name="subcategoria" required onchange="actualizarPrecio()">
+            <option value="" disabled selected>Elige un tipo de servicio</option>
         </select>
-    </div>
-    
-    <div class="form-group">
-        <label for="fecha">Selecciona una fecha:</label>
-        <input type="datetime-local" name="fecha" id="fecha" required class="form-control">
-    </div>
-    
-    <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Hacer Reserva</button>
-        <a href="#" class="btn btn-secondary">Ver mis reservas</a>
-    </div>
-</form>
+
+        <!-- Selección de Profesional -->
+        <label for="profesional">Selecciona el Profesional:</label>
+        <select id="profesional" name="profesional" required>
+            <option value="" disabled selected>Elige un profesional</option>
+        </select>
+
+        <!-- Selección de Fecha y Hora -->
+        <label for="fecha">Fecha:</label>
+        <input type="date" id="fecha" name="fecha" required>
+
+        <label for="hora">Hora:</label>
+        <input type="time" id="hora" name="hora" required>
+
+        <!-- Precio del Servicio Seleccionado -->
+        <div>
+            <p><strong>Precio del Servicio:</strong> $<span id="precio_servicio">0</span></p>
+        </div>
+
+        <!-- Botones -->
+        <div class="buttons">
+            <button type="submit" class="btn btn-primary">Hacer Reserva</button>
+            <a href="{% url 'ver_mis_reservas' %}" class="btn btn-secondary">Ver Mis Reservas</a>
+        </div>
+    </form>
+</div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    // Subcategorías por Servicio
+    const subcategoriasPorServicio = {
+        {% for servicio in servicios %}
+        "{{ servicio.id }}": [
+            {% for subcategoria in servicio.subcategorias.all %}
+            { "id": "{{ subcategoria.id }}", "nombre": "{{ subcategoria.nombre }}", "precio": "{{ subcategoria.precio_base }}" },
+            {% endfor %}
+        ],
+        {% endfor %}
+    };
+
+    // Filtrar subcategorías al seleccionar servicio
+    function filtrarSubcategorias() {
         const servicioSelect = document.getElementById('servicio');
-        const profesionalSelect = document.getElementById('profesional');
-    
-        servicioSelect.addEventListener('change', function() {
-            const servicioId = this.value;
-            
-            // Realiza la solicitud AJAX para obtener los profesionales del servicio seleccionado
-            fetch(`/obtener_profesionales_por_servicio/${servicioId}/`)
-                .then(response => response.json())
-                .then(profesionales => {
-                    // Limpia las opciones actuales
-                    profesionalSelect.innerHTML = '';
-    
-                    // Añade una opción por cada profesional filtrado
-                    profesionales.forEach(profesional => {
-                        const option = document.createElement('option');
-                        option.value = profesional.id;
-                        option.textContent = `${profesional.nombre} ${profesional.apellido}`;
-                        profesionalSelect.appendChild(option);
-                    });
-                })
-                .catch(error => console.error('Error al cargar profesionales:', error));
+        const subcategoriaSelect = document.getElementById('subcategoria');
+        const selectedServiceId = servicioSelect.value;
+        
+        subcategoriaSelect.innerHTML = '<option value="" disabled selected>Elige un tipo de servicio</option>';
+        
+        const subcategorias = subcategoriasPorServicio[selectedServiceId] || [];
+        subcategorias.forEach(subcategoria => {
+            const option = document.createElement('option');
+            option.value = subcategoria.id;
+            option.textContent = subcategoria.nombre;
+            option.dataset.precio = subcategoria.precio;
+            subcategoriaSelect.appendChild(option);
         });
-    });
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+    }
+
+    // Actualizar precio al seleccionar subcategoría
+    function actualizarPrecio() {
+        const subcategoriaSelect = document.getElementById('subcategoria');
+        const selectedOption = subcategoriaSelect.options[subcategoriaSelect.selectedIndex];
+        document.getElementById('precio_servicio').textContent = selectedOption.dataset.precio || "0";
+    }
+</script>
 {% endblock %}

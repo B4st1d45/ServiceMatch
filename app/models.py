@@ -18,15 +18,12 @@ class Usuario(AbstractUser):
 
     def __str__(self):
         return f"{self.nombre} {self.apellido} ({self.rol})"
-    
+
 class Servicio(models.Model):
     nombre = models.CharField(max_length=100)
-    descripcion = models.TextField()
-    tarifa = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
         return self.nombre
-
 
 class Profesional(models.Model):
     nombre = models.CharField(max_length=100)
@@ -36,15 +33,26 @@ class Profesional(models.Model):
     telefono = models.CharField(max_length=20)
     contrasena = models.CharField(max_length=128)
     rol = models.ForeignKey(Rol, on_delete=models.CASCADE)
+    estado = models.CharField(max_length=10, choices=[('activo', 'Activo'), ('inactivo', 'Inactivo')], default='activo')
 
     def __str__(self):
         return f"{self.nombre} {self.apellido} ({self.profesion.nombre})"
 
+# ----------------------------------------------------------------
+
+class Subcategoria(models.Model):
+    servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, related_name="subcategorias")
+    nombre = models.CharField(max_length=100)
+    precio_base = models.DecimalField(max_digits=10, decimal_places=2)
+    duracion_estimada = models.PositiveIntegerField()  # duración en minutos
+
+    def __str__(self):
+        return f"{self.nombre} - {self.servicio.nombre}"
 
 class Reserva(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     profesional = models.ForeignKey(Profesional, on_delete=models.CASCADE)
-    servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE)
+    subcategoria = models.ForeignKey(Subcategoria, on_delete=models.CASCADE)
     fecha = models.DateTimeField()
     estado = models.CharField(max_length=20, choices=[
         ('pendiente', 'Pendiente'),
@@ -53,8 +61,8 @@ class Reserva(models.Model):
     ])
 
     def __str__(self):
-        return f"Reserva de {self.usuario} con {self.professional} para {self.servicio} en {self.fecha}"
-
+        return f"Reserva de {self.usuario} para {self.subcategoria.nombre} con {self.profesional} el {self.fecha}"
+# ------------------------------------------------------------
 
 class Reseña(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)

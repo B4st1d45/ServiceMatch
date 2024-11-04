@@ -3,38 +3,68 @@
 {% block title %}Agregar Servicio{% endblock %}
 
 {% block content %}
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <h2 class="text-center mb-4">Agregar Servicio</h2>
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="form-group mb-3">
-                        <label for="nombre" class="form-label">Nombre del Servicio:</label>
-                        <input type="text" id="nombre" name="nombre" class="form-control" required>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="text-center mb-4">Agregar Servicio</h2>
+            <form method="post" id="form-servicio">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                    <label for="nombre" class="form-label">Nombre del Servicio:</label>
+                    <input type="text" id="nombre" name="nombre" class="form-control" required>
+                </div>
+
+                <div id="subcategorias-container">
+                    <div class="subcategoria mb-3">
+                        <h5>Subcategoría 1</h5>
+                        <label for="subcategoria_nombre_0">Nombre:</label>
+                        <input type="text" id="subcategoria_nombre_0" name="subcategoria_nombre_0" class="form-control mb-2" required>
+                        
+                        <label for="subcategoria_precio_0">Precio:</label>
+                        <input type="number" id="subcategoria_precio_0" name="subcategoria_precio_0" class="form-control mb-2" required>
+                        
+                        <label for="subcategoria_duracion_0">Duración aprox.:</label>
+                        <input type="text" id="subcategoria_duracion_0" name="subcategoria_duracion_0" class="form-control mb-2" required>
                     </div>
-                    <div class="form-group mb-3">
-                        <label for="descripcion" class="form-label">Descripción:</label>
-                        <textarea id="descripcion" name="descripcion" class="form-control" rows="3" required></textarea>
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="tarifa" class="form-label">Tarifa (desde):</label>
-                        <div class="input-group">
-                            <span class="input-group-text">$</span>
-                            <input type="number" id="tarifa" name="tarifa" class="form-control" required>
-                        </div>
-                    </div>
-                    <div class="form-actions text-center">
-                        <button type="submit" class="btn btn-primary">Guardar</button>
-                        <a href="{% url 'gestionar_profesion' %}" class="btn btn-secondary ms-2">Volver</a>
-                    </div>
-                </form>
-            </div>
+                </div>
+
+                <button type="button" id="add-subcategoria" class="btn btn-secondary mb-3">+ Agregar Subcategoría</button>
+
+                <div class="form-actions text-center">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <a href="{% url 'gestionar_profesion' %}" class="btn btn-secondary ms-2">Volver</a>
+                </div>
+            </form>
         </div>
-        <br>
-        <br>
     </div>
     <br>
     <br>
-{% endblock %}
+</div>
+<br>
+<br>
 
+<script>
+    let subcategoriaCount = 1;
+
+    document.getElementById('add-subcategoria').addEventListener('click', function() {
+        const container = document.getElementById('subcategorias-container');
+
+        const subcategoriaDiv = document.createElement('div');
+        subcategoriaDiv.className = 'subcategoria mb-3';
+        subcategoriaDiv.innerHTML = `
+            <h5>Subcategoría ${subcategoriaCount + 1}</h5>
+            <label for="subcategoria_nombre_${subcategoriaCount}">Nombre:</label>
+            <input type="text" id="subcategoria_nombre_${subcategoriaCount}" name="subcategoria_nombre_${subcategoriaCount}" class="form-control mb-2" required>
+            
+            <label for="subcategoria_precio_${subcategoriaCount}">Precio:</label>
+            <input type="number" id="subcategoria_precio_${subcategoriaCount}" name="subcategoria_precio_${subcategoriaCount}" class="form-control mb-2" required>
+            
+            <label for="subcategoria_duracion_${subcategoriaCount}">Duración aprox.:</label>
+            <input type="text" id="subcategoria_duracion_${subcategoriaCount}" name="subcategoria_duracion_${subcategoriaCount}" class="form-control mb-2" required>
+        `;
+
+        container.appendChild(subcategoriaDiv);
+        subcategoriaCount++;
+    });
+</script>
+{% endblock %}

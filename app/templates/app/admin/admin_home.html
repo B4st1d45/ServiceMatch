@@ -7,122 +7,98 @@
     <!-- Columna Izquierda: Sidebar -->
     <div class="sidebar">
         <h2>Gestión</h2>
-        <a href="{% url 'gestionar_profesionales' %}" class="btn-sidebar">Gestionar Profesionales</a>
-        <a href="{% url 'gestionar_profesion' %}" class="btn-sidebar">Gestionar Servicios</a>
+        <ul class="panel-btn">
+            <li><a href="#" class="btn-sidebar">Estadísticas</a></li>
+            <li><a href="#" class="btn-sidebar">Reservas</a></li>
+            <li><a href="#" class="btn-sidebar">Solicitudes</a></li>
+            <li><a href="{% url 'gestionar_profesionales' %}" class="btn-sidebar">Gestionar Profesionales</a></li>
+            <li><a href="{% url 'gestionar_profesion' %}" class="btn-sidebar">Gestionar Servicios</a></li>
+        </ul>
+        
     </div>
 
-    <!-- Columna Derecha: Contenidos principales -->
+    <!-- Gráfico de estadísticas -->
     <div class="main-content">
-        <!-- Filtros y gráfico -->
-        <div class="top-section">
-            <div class="filter-container">
-                <h3>Filtrar por Fechas</h3>
-                <form id="filtroFechas" method="GET">
-                    <label for="fechaInicio">Fecha de inicio:</label>
-                    <input type="date" id="fechaInicio" name="fechaInicio">
-                    
-                    <label for="fechaFin">Fecha de fin:</label>
-                    <input type="date" id="fechaFin" name="fechaFin">
-                    
-                    <button type="button" class="btn btn-primary" onclick="filtrarReservas()">Filtrar</button>
-                </form>
-            </div>
-            <div class="chart-container">
-                <canvas id="myChart" width="400" height="200"></canvas>
-            </div>
-        </div>
+        <h3>Estadísticas</h3> 
+        <input type="date" value="2022-08-31" class="date-picker">
 
-        <!-- Tabla de detalles -->
-        <div class="table-container">
-            <h3>Detalles de Reservas</h3>
-            <table id="detallesReservas" class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Cliente</th>
-                        <th>Profesional</th>
-                        <th>Servicio</th>
-                        <th>Fecha</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Reservas cargadas dinámicamente -->
-                </tbody>
-            </table>
+        <div class="card-container">
+            <div class="card">
+                <h4>Reservas</h4>
+                <p>201</p>
+            </div>
+            <div class="card">
+                <h4>Reservas completadas</h4>
+                <p>36</p>
+            </div>
+            <div class="card">
+                <h4>Usuarios</h4>
+                <p>4.890</p>
+            </div>
+        </div>    
+        <div class="card-container-gains">
+            <div class="card">
+                <h4>Promedio mensual $</h4>
+                <p>$25.410</p>
+            </div>
+            <div class="card">
+                <h4>Ganancias</h4>
+                <p>$1.352</p>
+            </div>
+        </div>    
+
+        <div class="chart-container">
+            <canvas id="myChart" width="400" height="200"></canvas>
         </div>
     </div>
 </div>
 
-    <script>
-        function cargarGrafico() {
-            fetch("{% url 'estadisticas_reservas' %}")
-                .then(response => response.json())
-                .then(data => {
-                    var ctx = document.getElementById('myChart').getContext('2d');
-                    var myChart = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: data.meses,
-                            datasets: [
-                                {
-                                    label: 'Completadas',
-                                    data: data.completadas,
-                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                    borderColor: 'rgba(75, 192, 192, 1)',
-                                    borderWidth: 1
-                                },
-                                {
-                                    label: 'Pendientes',
-                                    data: data.pendientes,
-                                    backgroundColor: 'rgba(255, 206, 86, 0.2)',
-                                    borderColor: 'rgba(255, 206, 86, 1)',
-                                    borderWidth: 1
-                                },
-                                {
-                                    label: 'Canceladas',
-                                    data: data.canceladas,
-                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                    borderColor: 'rgba(255, 99, 132, 1)',
-                                    borderWidth: 1
-                                }
-                            ]
-                        },
-                        options: {
-                            scales: {
-                                y: {
-                                    beginAtZero: true
-                                }
+<script>
+    function cargarGrafico() {
+        fetch("{% url 'estadisticas_reservas' %}")
+            .then(response => response.json())
+            .then(data => {
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.meses,
+                        datasets: [
+                            {
+                                label: 'Completadas',
+                                data: data.completadas,
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Pendientes',
+                                data: data.pendientes,
+                                backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                                borderColor: 'rgba(255, 206, 86, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Canceladas',
+                                data: data.canceladas,
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
                             }
                         }
-                    });
-                })
-                .catch(error => console.error('Error:', error));
-        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    }
 
-        function filtrarReservas() {
-            const fechaInicio = document.getElementById('fechaInicio').value;
-            const fechaFin = document.getElementById('fechaFin').value;
-
-            fetch(`{% url 'filtrar_reservas' %}?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`)
-                .then(response => response.json())
-                .then(data => {
-                    const tbody = document.getElementById('detallesReservas').querySelector('tbody');
-                    tbody.innerHTML = ''; // Limpiar la tabla
-
-                    data.reservas.forEach(reserva => {
-                        const fila = `<tr>
-                            <td>${reserva.cliente}</td>
-                            <td>${reserva.profesional}</td>
-                            <td>${reserva.servicio}</td>
-                            <td>${reserva.fecha}</td>
-                            <td>${reserva.estado}</td>
-                        </tr>`;
-                        tbody.innerHTML += fila;
-                    });
-                })
-                .catch(error => console.error('Error:', error));
-        }
-
-        window.onload = cargarGrafico;
-    </script>
+    window.onload = cargarGrafico;
+</script>
 {% endblock %}

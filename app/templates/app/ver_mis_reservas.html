@@ -1,0 +1,33 @@
+{% extends 'app/header.html' %}
+
+{% block title %}Mis Reservas{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Mis Reservas</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Servicio</th>
+                <th>Profesional</th>
+                <th>Fecha y Hora</th>
+                <th>Precio</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reserva in reservas %}
+                <tr>
+                    <td>{{ reserva.servicio.nombre }}</td>
+                    <td>{{ reserva.profesional.nombre }} {{ reserva.profesional.apellido }}</td>
+                    <td>{{ reserva.fecha|date:"d M Y H:i" }}</td>
+                    <td>${{ reserva.servicio.tarifa }}</td>
+                    <td>
+                        <a href="{% url 'eliminar_reserva' reserva.id %}" class="btn btn-danger">Eliminar</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
