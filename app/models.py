@@ -44,7 +44,7 @@ class Subcategoria(models.Model):
     servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, related_name="subcategorias")
     nombre = models.CharField(max_length=100)
     precio_base = models.DecimalField(max_digits=10, decimal_places=2)
-    duracion_estimada = models.PositiveIntegerField()  # duración en minutos
+    duracion_estimada = models.PositiveIntegerField() 
 
     def __str__(self):
         return f"{self.nombre} - {self.servicio.nombre}"

@@ -3,61 +3,55 @@
 {% block title %}Gestionar Servicios{% endblock %}
 
 {% block content %}
-    <div class="container mt-5">
-        <h2 class="text-center mb-4">Gestión de Servicios</h2>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Gestión de Servicios</h2>
 
-        <!-- Botones -->
-        <div class="d-flex justify-content-center mb-4">
-            <a href="{% url 'agregar_profesion' %}" class="btn btn-success me-3">
-                <i class="fas fa-plus-circle"></i> Agregar Servicio
-            </a>
-            <a href="{% url 'admin_home' %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Volver
-            </a>
-        </div>
-
-        <!-- Tabla  -->
-        <table class="table table-hover table-bordered table-responsive-md text-center shadow">
-            <thead class="bg-dark text-white">
-                <tr>
-                    <th scope="col">Nombre del Servicio</th>
-                    <th scope="col">Subcategorías</th>  <!-- Nueva columna -->
-                    <th scope="col">Acción</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for servicio in servicios %}  <!-- Cambié 'profesion' a 'servicio' -->
-                    <tr>
-                        <td>{{ servicio.nombre }}</td>
-                        <td>
-                            {% if servicio.subcategoria_set.all %}  <!-- Acceso a las subcategorías -->
-                                <ul class="list-unstyled">
-                                    {% for subcat in servicio.subcategoria_set.all %}
-                                        <li>{{ subcat.nombre }} - ${{ subcat.precio | floatformat:0 }} ({{ subcat.duracion }})</li>
-                                    {% endfor %}
-                                </ul>
-                            {% else %}
-                                <span class="text-muted">Sin subcategorías</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <!-- Botones de acción -->
-                            <div class="d-flex justify-content-center">
-                                <a href="{% url 'actualizar_profesion' servicio.id %}" class="btn btn-warning btn-sm me-2">
-                                    <i class="fas fa-edit"></i> Actualizar
-                                </a>
-                                <a href="{% url 'eliminar_profesion' servicio.id %}" class="btn btn-danger btn-sm">
-                                    <i class="fas fa-trash-alt"></i> Eliminar
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="3" class="text-muted">No hay servicios registrados.</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="d-flex justify-content-center mb-4">
+        <a href="{% url 'agregar_profesion' %}" class="btn btn-success me-3">
+            <i class="fas fa-plus-circle"></i> Agregar Servicio
+        </a>
+        <a href="{% url 'admin_home' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
     </div>
+
+    <div class="row">
+        {% for servicio in servicios %}
+            <div class="col-md-4 mb-4">
+                <div class="card shadow">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="card-title mb-0">{{ servicio.nombre }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Subcategorías</h6>
+                        {% if servicio.subcategorias.exists %}
+                            <ul class="list-group list-group-flush">
+                                {% for subcat in servicio.subcategorias.all %}
+                                    <li class="list-group-item">
+                                        {{ subcat.nombre }} - ${{ subcat.precio_base|floatformat:0 }}
+                                        <span class="text-muted">({{ subcat.duracion_estimada }} horas)</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted">Sin subcategorías</p>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <a href="{% url 'actualizar_profesion' servicio.id %}" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i> Actualizar
+                        </a>
+                        <a href="{% url 'eliminar_profesion' servicio.id %}" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash-alt"></i> Eliminar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center text-muted">
+                No hay servicios registrados.
+            </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

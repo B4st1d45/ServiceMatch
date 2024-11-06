@@ -186,30 +186,29 @@ def eliminar_profesional(request, profesional_id):
 
 # gestionar profesion
 def gestionar_profesion(request):
-    servicios = Servicio.objects.all()  # Cambié 'profesiones' a 'servicios' para mayor claridad
+    servicios = Servicio.objects.all() 
     return render(request, 'app/admin/gestionar_profesion.html', {'servicios': servicios})
+
 
 def agregar_profesion(request):
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
-        subcategorias_data = request.POST.getlist('subcategorias')  # Obtener subcategorías
 
         # Crear el servicio
-        nuevo_servicio = Servicio(
-            nombre=nombre,
-        )
+        nuevo_servicio = Servicio(nombre=nombre)
         nuevo_servicio.save()
 
         # Crear subcategorías
-        for subcat_data in subcategorias_data:
-            # Aquí asumo que `subcat_data` contiene el nombre, precio y duración en un formato específico
-            # Ejemplo: "nombre;precio;duracion"
-            nombre_subcat, precio, duracion = subcat_data.split(';')
+        for i in range(len(request.POST.getlist('subcategoria_nombre'))):
+            nombre_subcat = request.POST.getlist('subcategoria_nombre')[i]
+            precio = request.POST.getlist('subcategoria_precio')[i]
+            duracion = request.POST.getlist('subcategoria_duracion')[i]
+            
             nueva_subcategoria = Subcategoria(
+                servicio=nuevo_servicio,
                 nombre=nombre_subcat,
-                precio=precio,
-                duracion=duracion,
-                servicio=nuevo_servicio  # Relaciona la subcategoría con el servicio
+                precio_base=precio,
+                duracion_estimada=duracion
             )
             nueva_subcategoria.save()
 
@@ -218,29 +217,47 @@ def agregar_profesion(request):
 
     return render(request, 'app/admin/agregar_profesion.html')
 
-def actualizar_profesion(request, profesion_id):
-    profesion = get_object_or_404(Servicio, id=profesion_id)
-    subcategorias = Subcategoria.objects.all() 
+def actualizar_profesion(request, servicio_id):
+    servicio = get_object_or_404(Servicio, id=servicio_id)
+    subcategorias_existentes = servicio.subcategorias.all()
+    todas_las_subcategorias = Subcategoria.objects.all()
 
     if request.method == 'POST':
-        profesion.nombre = request.POST.get('nombre')
-        
-        profesion.save()
+        # Actualizar nombre y otros campos básicos del servicio
+        servicio.nombre = request.POST.get('nombre')
+        servicio.save()
 
-        messages.success(request, 'Profesión actualizada exitosamente.')
-        return redirect('gestionar_profesion')
+        # Actualizar las subcategorías existentes
+        for subcategoria in subcategorias_existentes:
+            subcategoria.nombre = request.POST.get(f'nombre_{subcategoria.id}')
+            subcategoria.precio_base = request.POST.get(f'precio_{subcategoria.id}')
+            subcategoria.duracion_estimada = request.POST.get(f'duracion_{subcategoria.id}')
+            subcategoria.save()
 
-    return render(request, 'app/admin/actualizar_profesion.html', {'profesion': profesion, 'subcategorias': subcategorias})
+        # Agregar nuevas subcategorías al servicio
+        nuevas_subcategorias_ids = request.POST.getlist('nuevas_subcategorias')
+        for subcategoria_id in nuevas_subcategorias_ids:
+            nueva_subcategoria = Subcategoria.objects.get(id=subcategoria_id)
+            servicio.subcategorias.add(nueva_subcategoria)
 
-def eliminar_profesion(request, profesion_id):
-    profesion = get_object_or_404(Servicio, id=profesion_id)
+        servicio.save()
+        return redirect('detalle_servicio', servicio_id=servicio.id)
+
+    return render(request, 'app/admin/actualizar_profesion.html', {
+        'servicio': servicio,
+        'subcategorias_existentes': subcategorias_existentes,
+        'todas_las_subcategorias': todas_las_subcategorias,
+    })
+
+def eliminar_profesion(request, servicio_id):
+    servicio = get_object_or_404(Servicio, id=servicio_id)
 
     if request.method == 'POST':
-        profesion.delete()
-        messages.success(request, 'Profesión eliminada exitosamente.')
+        servicio.delete()
+        messages.success(request, 'Servicio eliminado exitosamente.')
         return redirect('gestionar_profesion')
 
-    return render(request, 'app/admin/confirmar_eliminacion.html', {'profesion': profesion})
+    return render(request, 'app/admin/confirmar_eliminacion.html', {'servicio': servicio})
 
 # gestionar reservas
 @login_required
