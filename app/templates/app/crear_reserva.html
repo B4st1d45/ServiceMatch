@@ -4,6 +4,16 @@
 <div class="container">
     <h1>Crear Reserva</h1>
 
+    {% if messages %}
+        <div class="alert-container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
     <form method="POST" action="{% url 'crear_reserva' %}">
         {% csrf_token %}
 
@@ -34,7 +44,7 @@
         <input type="date" id="fecha" name="fecha" required>
 
         <label for="hora">Hora:</label>
-        <input type="time" id="hora" name="hora" required>
+        <input type="time" id="hora" name="hora" min="09:00" max="19:00" step="1800" required>
 
         <!-- Precio del Servicio Seleccionado -->
         <div>

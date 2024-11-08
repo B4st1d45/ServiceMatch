@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+from datetime import timedelta
 
 
 class Rol(models.Model):
@@ -62,6 +65,29 @@ class Reserva(models.Model):
 
     def __str__(self):
         return f"Reserva de {self.usuario} para {self.subcategoria.nombre} con {self.profesional} el {self.fecha}"
+    
+    def _validar_dia_habil(self):
+        if self.fecha.weekday() >= 5:  # Sábado (5) o domingo (6)
+            raise ValidationError("Solo puedes reservar de lunes a viernes.")
+
+    def _validar_fecha_futura(self):
+        if self.fecha <= timezone.now() + timedelta(hours=24):
+            raise ValidationError("La reserva debe hacerse al menos 24 horas en el futuro.")
+
+    def _validar_disponibilidad(self):
+        inicio_rango = self.fecha - timedelta(hours=1)
+        fin_rango = self.fecha + timedelta(hours=1)
+        if Reserva.objects.filter(profesional=self.profesional, fecha__range=(inicio_rango, fin_rango)).exists():
+            raise ValidationError("Este profesional no está disponible en esa fecha y hora.")
+        
+    def clean(self):
+        self._validar_dia_habil()
+        self._validar_fecha_futura()
+        self._validar_disponibilidad()
+
+    def save(self, *args, **kwargs):
+        self.clean()  # Asegura que las validaciones se ejecuten antes de guardar
+        super().save(*args, **kwargs)
 # ------------------------------------------------------------
 
 class Reseña(models.Model):

@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
+from django.utils import timezone
 from django.shortcuts import render, redirect
 from .models import Servicio, Profesional, Rol, Reserva, Subcategoria, Reseña, Usuario
 from django.shortcuts import get_object_or_404, redirect
@@ -11,7 +12,7 @@ from django.utils.dateformat import DateFormat
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
-
+from django.core.exceptions import ValidationError
 
 
 def inicio(request):
@@ -267,6 +268,28 @@ def eliminar_profesion(request, servicio_id):
 
     return render(request, 'app/admin/confirmar_eliminacion.html', {'servicio': servicio})
 
+# validaciones para hacer una reserva exitosa
+def validar_disponibilidad(profesional, fecha, hora):
+    # Aquí iría la lógica para comprobar la disponibilidad
+    fecha_hora_reserva = datetime.combine(fecha, hora)
+    reservas = Reserva.objects.filter(profesional=profesional, fecha=fecha)
+
+    for reserva in reservas:
+        reserva_fecha_hora = datetime.combine(reserva.fecha, reserva.hora)
+        if abs((reserva_fecha_hora - fecha_hora_reserva).total_seconds()) < 3600:
+            raise ValidationError("El profesional ya tiene una reserva en este horario.")
+        
+def validar_dia_habil(fecha):
+    if fecha.weekday() >= 5:  # 5 = Sábado, 6 = Domingo
+        raise ValidationError("Solo puedes reservar de lunes a viernes.")
+    
+def validar_fecha_futura(fecha):
+    hoy = datetime.now().date()
+    if fecha <= hoy:
+        raise ValidationError("La reserva debe ser para una fecha futura.")
+    if fecha - hoy < timedelta(days=1):
+        raise ValidationError("La reserva debe hacerse con al menos 24 horas de anticipación.")
+
 # gestionar reservas
 @login_required
 def crear_reserva(request):
@@ -277,15 +300,10 @@ def crear_reserva(request):
         hora = request.POST.get('hora')
 
         # Concatenar fecha y hora en un solo campo DateTime
-        fecha_hora = f"{fecha} {hora}"
-        fecha_hora = datetime.strptime(fecha_hora, '%Y-%m-%d %H:%M')
-
-        # Verificar disponibilidad del profesional
+        fecha_hora = datetime.strptime(f"{fecha} {hora}", '%Y-%m-%d %H:%M')
+        fecha_hora = timezone.make_aware(fecha_hora)
         profesional = get_object_or_404(Profesional, id=profesional_id)
         subcategoria = get_object_or_404(Subcategoria, id=subcategoria_id)
-        if Reserva.objects.filter(profesional=profesional, fecha=fecha_hora).exists():
-            messages.error(request, 'Este profesional no está disponible en esa fecha y hora.')
-            return redirect('crear_reserva')
 
         # Crear la reserva
         reserva = Reserva(
@@ -295,10 +313,14 @@ def crear_reserva(request):
             fecha=fecha_hora,
             estado='pendiente'
         )
-        reserva.save()
 
-        messages.success(request, 'Reserva creada exitosamente.')
-        return redirect('ver_mis_reservas')
+        try:
+            reserva.save()
+            messages.success(request, 'Reserva creada exitosamente.')
+            return redirect('ver_mis_reservas')
+        except ValidationError as e:
+            messages.error(request, e.message)
+            return redirect('crear_reserva')
 
     else:
         servicios = Servicio.objects.all()
