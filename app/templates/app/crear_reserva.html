@@ -9,10 +9,11 @@
 
         <!-- Selección de Servicio -->
         <label for="servicio">Selecciona el Servicio:</label>
-        <select id="servicio" name="servicio" required onchange="filtrarSubcategorias()">
+        <select id="servicio" name="servicio" required onchange="filtrarSubcategorias(), filtrarProfesionales()">
             <option value="" disabled selected>Elige un servicio</option>
             {% for servicio in servicios %}
-                <option value="{{ servicio.id }}">{{ servicio.nombre }}</option>
+                <option value="{{ servicio.id }}">
+                    {{ servicio.nombre }}</option>
             {% endfor %}
         </select>
 
@@ -83,6 +84,41 @@
         const subcategoriaSelect = document.getElementById('subcategoria');
         const selectedOption = subcategoriaSelect.options[subcategoriaSelect.selectedIndex];
         document.getElementById('precio_servicio').textContent = selectedOption.dataset.precio || "0";
+    }
+
+    const profesionalesPorServicio = {
+        {% for servicio in servicios %}
+        {{ servicio.id }}: [
+            {% for profesional in profesionales %}
+            {% if profesional.profesion_id == servicio.id %}
+            {
+                "id": {{ profesional.id }},
+                "nombre": "{{ profesional.nombre }}",
+                "apellido": "{{ profesional.apellido }}",
+                "profesion": "{{ profesional.profesion.nombre }}"
+            }{% if not forloop.last %},{% endif %}
+            {% endif %}
+            {% endfor %}
+        ],
+        {% endfor %}
+    };
+
+    function filtrarProfesionales() {
+        const servicioSelect = document.getElementById('servicio');
+        const profesionalSelect = document.getElementById('profesional');
+        const selectedServiceId = servicioSelect.value;
+
+        profesionalSelect.innerHTML = '<option value="" disabled selected>Elige un profesional</option>';
+
+        if (selectedServiceId) {
+            const profesionales = profesionalesPorServicio[selectedServiceId] || [];
+            profesionales.forEach(profesional => {
+                const option = document.createElement('option');
+                option.value = profesional.id;
+                option.textContent = `${profesional.nombre} ${profesional.apellido}`;
+                profesionalSelect.appendChild(option);
+            });
+        }
     }
 </script>
 {% endblock %}

@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from django.shortcuts import render, redirect
 from .models import Servicio, Profesional, Rol, Reserva, Subcategoria, Reseña, Usuario
 from django.shortcuts import get_object_or_404, redirect
@@ -235,12 +235,20 @@ def actualizar_profesion(request, servicio_id):
             subcategoria.save()
 
         # Agregar nuevas subcategorías al servicio
-        nuevas_subcategorias_ids = request.POST.getlist('nuevas_subcategorias')
-        for subcategoria_id in nuevas_subcategorias_ids:
-            nueva_subcategoria = Subcategoria.objects.get(id=subcategoria_id)
-            servicio.subcategorias.add(nueva_subcategoria)
+        nuevas_subcategorias_nombres = request.POST.getlist('nueva_subcategoria_nombre')
+        nuevas_subcategorias_precios = request.POST.getlist('nueva_subcategoria_precio')
+        nuevas_subcategorias_duraciones = request.POST.getlist('nueva_subcategoria_duracion')
 
-        servicio.save()
+        for nombre, precio, duracion in zip(nuevas_subcategorias_nombres, nuevas_subcategorias_precios, nuevas_subcategorias_duraciones):
+            if nombre:  # Verifica que no esté vacío
+                nueva_subcategoria = Subcategoria(
+                    nombre=nombre,
+                    precio_base=precio,
+                    duracion_estimada=duracion,
+                    servicio=servicio  # Aquí asignamos el servicio al que pertenece
+                )
+                nueva_subcategoria.save()
+
         return redirect('detalle_servicio', servicio_id=servicio.id)
 
     return render(request, 'app/admin/actualizar_profesion.html', {

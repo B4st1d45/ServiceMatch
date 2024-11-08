@@ -18,10 +18,10 @@
         <tbody>
             {% for reserva in reservas %}
                 <tr>
-                    <td>{{ reserva.servicio.nombre }}</td>
+                    <td>{{ reserva.subcategoria.nombre }}</td>
                     <td>{{ reserva.profesional.nombre }} {{ reserva.profesional.apellido }}</td>
                     <td>{{ reserva.fecha|date:"d M Y H:i" }}</td>
-                    <td>${{ reserva.servicio.tarifa }}</td>
+                    <td>${{ reserva.subcategoria.precio_base }}</td>
                     <td>
                         <a href="{% url 'eliminar_reserva' reserva.id %}" class="btn btn-danger">Eliminar</a>
                     </td>
