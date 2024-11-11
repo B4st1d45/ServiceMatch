@@ -41,8 +41,6 @@ class Profesional(models.Model):
     def __str__(self):
         return f"{self.nombre} {self.apellido} ({self.profesion.nombre})"
 
-# ----------------------------------------------------------------
-
 class Subcategoria(models.Model):
     servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, related_name="subcategorias")
     nombre = models.CharField(max_length=100)
@@ -67,7 +65,7 @@ class Reserva(models.Model):
         return f"Reserva de {self.usuario} para {self.subcategoria.nombre} con {self.profesional} el {self.fecha}"
     
     def _validar_dia_habil(self):
-        if self.fecha.weekday() >= 5:  # Sábado (5) o domingo (6)
+        if self.fecha.weekday() >= 5:  
             raise ValidationError("Solo puedes reservar de lunes a viernes.")
 
     def _validar_fecha_futura(self):
@@ -86,9 +84,8 @@ class Reserva(models.Model):
         self._validar_disponibilidad()
 
     def save(self, *args, **kwargs):
-        self.clean()  # Asegura que las validaciones se ejecuten antes de guardar
+        self.clean() 
         super().save(*args, **kwargs)
-# ------------------------------------------------------------
 
 class Reseña(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)

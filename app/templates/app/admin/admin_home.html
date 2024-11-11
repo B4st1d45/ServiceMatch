@@ -20,7 +20,7 @@
     <!-- Gráfico de estadísticas -->
     <div class="main-content">
         <h3>Estadísticas</h3> 
-        <input type="date" value="2022-08-31" class="date-picker">
+        <input type="date" id="datePicker" class="date-picker">
 
         <div class="card-container">
             <div class="card">
@@ -90,7 +90,10 @@
                     options: {
                         scales: {
                             y: {
-                                beginAtZero: true
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
                             }
                         }
                     }
@@ -100,5 +103,10 @@
     }
 
     window.onload = cargarGrafico;
+
+    // Obtener la fecha de hoy en el formato YYYY-MM-DD
+    const today = new Date().toISOString().split('T')[0];
+    // Establecer el valor del input
+    document.getElementById("datePicker").value = today;
 </script>
 {% endblock %}

@@ -230,9 +230,18 @@ def actualizar_profesion(request, servicio_id):
 
         # Actualizar las subcategorías existentes
         for subcategoria in subcategorias_existentes:
-            subcategoria.nombre = request.POST.get(f'nombre_{subcategoria.id}')
-            subcategoria.precio_base = request.POST.get(f'precio_{subcategoria.id}')
-            subcategoria.duracion_estimada = request.POST.get(f'duracion_{subcategoria.id}')
+            subcategoria_nombre = request.POST.get('subcategoria_nombre')
+            subcategoria_precio = request.POST.get('subcategoria_precio')
+            subcategoria_duracion = request.POST.get('subcategoria_duracion')
+            
+            # Verificar que los campos no sean None antes de guardar
+            if subcategoria_nombre:
+                subcategoria.nombre = subcategoria_nombre
+            if subcategoria_precio:
+                subcategoria.precio_base = subcategoria_precio
+            if subcategoria_duracion:
+                subcategoria.duracion_estimada = subcategoria_duracion
+            
             subcategoria.save()
 
         # Agregar nuevas subcategorías al servicio
@@ -241,12 +250,12 @@ def actualizar_profesion(request, servicio_id):
         nuevas_subcategorias_duraciones = request.POST.getlist('nueva_subcategoria_duracion')
 
         for nombre, precio, duracion in zip(nuevas_subcategorias_nombres, nuevas_subcategorias_precios, nuevas_subcategorias_duraciones):
-            if nombre:  # Verifica que no esté vacío
+            if nombre:  
                 nueva_subcategoria = Subcategoria(
                     nombre=nombre,
                     precio_base=precio,
                     duracion_estimada=duracion,
-                    servicio=servicio  # Aquí asignamos el servicio al que pertenece
+                    servicio=servicio  
                 )
                 nueva_subcategoria.save()
 

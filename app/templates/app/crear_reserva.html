@@ -1,7 +1,7 @@
 {% extends 'app/header.html' %}
 
 {% block content %}
-<div class="container">
+<div class="container-reserva">
     <h1>Crear Reserva</h1>
 
     {% if messages %}
@@ -18,7 +18,7 @@
         {% csrf_token %}
 
         <!-- Selección de Servicio -->
-        <label for="servicio">Selecciona el Servicio:</label>
+        <label class="label-cajitas" for="servicio">Selecciona el Servicio:</label>
         <select id="servicio" name="servicio" required onchange="filtrarSubcategorias(), filtrarProfesionales()">
             <option value="" disabled selected>Elige un servicio</option>
             {% for servicio in servicios %}
@@ -28,33 +28,33 @@
         </select>
 
         <!-- Selección de Subcategoría -->
-        <label for="subcategoria">Selecciona el Tipo de Servicio:</label>
+        <label class="label-cajitas" for="subcategoria">Selecciona el Tipo de Servicio:</label>
         <select id="subcategoria" name="subcategoria" required onchange="actualizarPrecio()">
             <option value="" disabled selected>Elige un tipo de servicio</option>
         </select>
 
         <!-- Selección de Profesional -->
-        <label for="profesional">Selecciona el Profesional:</label>
+        <label class="label-cajitas" for="profesional">Selecciona el Profesional:</label>
         <select id="profesional" name="profesional" required>
             <option value="" disabled selected>Elige un profesional</option>
         </select>
 
         <!-- Selección de Fecha y Hora -->
-        <label for="fecha">Fecha:</label>
+        <label class="label-cajitas" for="fecha">Fecha:</label>
         <input type="date" id="fecha" name="fecha" required>
 
-        <label for="hora">Hora:</label>
+        <label class="label-cajitas" for="hora">Hora:</label>
         <input type="time" id="hora" name="hora" min="09:00" max="19:00" step="1800" required>
 
         <!-- Precio del Servicio Seleccionado -->
         <div>
-            <p><strong>Precio del Servicio:</strong> $<span id="precio_servicio">0</span></p>
+            <p><strong>Precio del Servicio:</strong> <span id="precio_servicio"> 0</span></p>
         </div>
 
         <!-- Botones -->
-        <div class="buttons">
-            <button type="submit" class="btn btn-primary">Hacer Reserva</button>
-            <a href="{% url 'ver_mis_reservas' %}" class="btn btn-secondary">Ver Mis Reservas</a>
+        <div class="botones-reserva">
+            <button type="submit" class="btn btn-reserva">Hacer Reserva</button>
+            <a href="{% url 'ver_mis_reservas' %}" class="btn btn-ver-reserva">Ver Mis Reservas</a>
         </div>
     </form>
 </div>
@@ -93,8 +93,8 @@
     function actualizarPrecio() {
         const subcategoriaSelect = document.getElementById('subcategoria');
         const selectedOption = subcategoriaSelect.options[subcategoriaSelect.selectedIndex];
-        document.getElementById('precio_servicio').textContent = selectedOption.dataset.precio || "0";
-    }
+        let precio = parseFloat(selectedOption.dataset.precio || "0");
+        document.getElementById('precio_servicio').textContent = precio.toLocaleString('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 });    }
 
     const profesionalesPorServicio = {
         {% for servicio in servicios %}
