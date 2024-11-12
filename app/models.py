@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from datetime import timedelta
+from django.contrib.auth.hashers import make_password, check_password
 
 
 class Rol(models.Model):
@@ -28,6 +29,7 @@ class Servicio(models.Model):
     def __str__(self):
         return self.nombre
 
+
 class Profesional(models.Model):
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
@@ -40,6 +42,16 @@ class Profesional(models.Model):
 
     def __str__(self):
         return f"{self.nombre} {self.apellido} ({self.profesion.nombre})"
+    
+    def save(self, *args, **kwargs):
+        if not self.id or not self._state.adding and not check_password(self.contrasena, self.contrasena):  # Solo encriptar si no está encriptada
+            self.contrasena = make_password(self.contrasena)
+        super(Profesional, self).save(*args, **kwargs)
+    
+    def check_password(self, raw_password):
+        return check_password(raw_password, self.contrasena)
+
+
 
 class Subcategoria(models.Model):
     servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, related_name="subcategorias")

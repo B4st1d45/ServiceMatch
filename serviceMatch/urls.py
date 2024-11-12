@@ -29,6 +29,7 @@ urlpatterns = [
     path('register/', views.user_register, name='register'),
     path('logout/', views.user_logout, name='logout'),
     path("terminos/", views.terminos, name="terminos"),
+    path('login_profesional/', views.login_profesional, name='login_profesional'),
         
     path('admin_home/', views.admin_home, name='admin_home'),
     
@@ -42,10 +43,12 @@ urlpatterns = [
     path('actualizar_profesion/<int:servicio_id>/', views.actualizar_profesion, name='actualizar_profesion'),
     path('eliminar_profesion/<int:servicio_id>/', views.eliminar_profesion, name='eliminar_profesion'),
 
+    path('login_profesional/', views.login_profesional, name='login_profesional'),
+    path('dashboard_profesional/', views.dashboard_profesional, name='dashboard_profesional'),
+    
     path('crear_reserva/', views.crear_reserva, name='crear_reserva'),
     path('ver-mis-reservas/', views.ver_mis_reservas, name='ver_mis_reservas'),
     path('eliminar_reserva/<int:reserva_id>/', views.eliminar_reserva, name='eliminar_reserva'),
-
 
     path('estadisticas/', views.obtener_estadisticas_reservas, name='estadisticas_reservas'),
     path('filtro_reservas/', views.filtrar_reservas, name='filtrar_reservas'),

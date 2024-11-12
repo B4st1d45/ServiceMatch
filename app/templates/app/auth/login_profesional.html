@@ -1,10 +1,10 @@
 {% extends 'app/header.html' %}
 
-{% block title %}Iniciar Sesión{% endblock %}
+{% block title %}Iniciar Sesión - Profesional{% endblock %}
 
 {% block content %}
     <div class="login-container">
-        <h2>Iniciar Sesión</h2>
+        <h2>Iniciar Sesión - Profesional</h2>
         {% if messages %}
             <script>
                 {% for message in messages %}
@@ -24,7 +24,6 @@
             </div>
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
-                <a href="{% url 'register' %}" class="btn btn-secondary">Registrarse</a>
             </div>
         </form>
     </div>
