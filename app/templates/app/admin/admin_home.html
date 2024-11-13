@@ -25,25 +25,25 @@
         <div class="card-container">
             <div class="card">
                 <h4>Reservas</h4>
-                <p>201</p>
+                <p>{{ total_reservas }}</p>
             </div>
             <div class="card">
                 <h4>Reservas completadas</h4>
-                <p>36</p>
+                <p>{{ reservas_completadas }}</p>
             </div>
             <div class="card">
                 <h4>Usuarios</h4>
-                <p>4.890</p>
+                <p>{{ total_usuarios }}</p>
             </div>
         </div>    
         <div class="card-container-gains">
             <div class="card">
                 <h4>Promedio mensual $</h4>
-                <p>$25.410</p>
+                <p>${{ promedio_mensual }}</p>
             </div>
             <div class="card">
                 <h4>Ganancias</h4>
-                <p>$1.352</p>
+                <p>${{ ganancias }}</p>
             </div>
         </div>    
 
@@ -110,3 +110,4 @@
     document.getElementById("datePicker").value = today;
 </script>
 {% endblock %}
+

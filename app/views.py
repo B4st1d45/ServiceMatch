@@ -387,6 +387,7 @@ def obtener_estadisticas_reservas(request):
             
     return JsonResponse(data)
 
+
 # gestionar filtrado de reservas
 @login_required
 def filtrar_reservas(request):

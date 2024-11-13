@@ -4,6 +4,8 @@ from django.contrib.auth.views import LogoutView
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from app.views.estadisticas_views import obtener_estadisticas_tarjetas, obtener_estadisticas_reservas
+
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -54,5 +56,6 @@ urlpatterns = [
     path('eliminar_reserva/<int:reserva_id>/', views.eliminar_reserva, name='eliminar_reserva'),
 
     path('estadisticas/', views.obtener_estadisticas_reservas, name='estadisticas_reservas'),
+    path('estadisticas/tarjetas/', obtener_estadisticas_tarjetas , name='obtener_estadisticas_tarjetas'),
     path('filtro_reservas/', views.filtrar_reservas, name='filtrar_reservas'),
 ]

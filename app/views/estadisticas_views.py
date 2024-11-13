@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
-from app.models import Reserva
+from app.models import Reserva, Usuario
 from django.http import JsonResponse
 from django.db.models import Count
 
@@ -33,4 +33,24 @@ def obtener_estadisticas_reservas(request):
         elif reserva['estado'] == 'cancelada':
             data['canceladas'].append(reserva['cantidad'])
             
+    return JsonResponse(data)
+
+@user_passes_test(es_admin)
+def obtener_estadisticas_tarjetas(request):
+    total_reservas = Reserva.objects.count()
+    reservas_completadas = Reserva.objects.filter(estado='completada').count()
+    total_usuarios = Usuario.objects.count()  
+
+    # Ejemplo de cálculo de promedio mensual y ganancias (ajusta según tus datos)
+    ganancias = Reserva.objects.filter(estado='completada').aggregate(total_ganancias=sum('precio'))['total_ganancias'] or 0
+    promedio_mensual = ganancias / 12  
+
+    data = {
+        'total_reservas': total_reservas,
+        'reservas_completadas': reservas_completadas,
+        'total_usuarios': total_usuarios,
+        'promedio_mensual': round(promedio_mensual, 2),
+        'ganancias': ganancias,
+    }
+
     return JsonResponse(data)
