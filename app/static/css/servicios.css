@@ -25,10 +25,26 @@
     margin: 20px 0;
 }
 
-.services-intro .btn-discover {
-    padding: 10px 20px;
-    background-color: #630D3B;
+.services-intro .btn-agregar {
+    padding: 10px 20px; 
+    background-color: #630D3B !important;
     color: #E9E3FF;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.btn-agregar {
+    padding: 10px 20px; 
+    background-color: #630D3B !important;
+    color: #E9E3FF !important;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.btn-volver {
+    padding: 10px 20px; 
+    background-color: #8a707d !important;
+    color: #E9E3FF !important;
     text-decoration: none;
     border-radius: 5px;
 }
@@ -84,4 +100,9 @@
 .service-card h3, .service-card p {
     position: relative; 
     z-index: 2; 
+}
+
+.card-header {
+    background-color: #431F32 !important;
+    color: #ffffff !important;
 }
