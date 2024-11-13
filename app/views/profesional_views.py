@@ -50,13 +50,17 @@ def profesional_home(request):
     
     profesional = Profesional.objects.get(id=profesional_id)
     return render(request, 'app/profesional/profesional_home.html', {'profesional': profesional})
-
+'''
 
 @login_required
 def dashboard_profesional(request):
-    return render(request, 'app/profesional/dashboard.html')
+    profesional_id = request.session.get('profesional_id')
+    if not profesional_id:
+        return redirect('login_profesional')
 
-'''
+    profesional = Profesional.objects.get(id=profesional_id)
+    return render(request, 'app/dashboard_profesional.html', {'profesional': profesional})
+
 
 # Editar perfil
 def editar_perfil(request):
@@ -76,3 +80,6 @@ def editar_perfil(request):
 
     return render(request, "app/profesional/editar_perfil.html", {"profesional": profesional})'''
     return render(request, "app/profesional/editar_perfil.html")
+
+def calendario_reservas(request):
+    return render(request, "app/profesional/calendario_reservas.html")

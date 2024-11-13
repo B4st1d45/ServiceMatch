@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth.hashers import make_password, check_password
-
+from django.conf import settings
 
 class Rol(models.Model):
     nombre = models.CharField(max_length=50, unique=True)
@@ -39,12 +39,13 @@ class Profesional(models.Model):
     contrasena = models.CharField(max_length=128)
     rol = models.ForeignKey(Rol, on_delete=models.CASCADE)
     estado = models.CharField(max_length=10, choices=[('activo', 'Activo'), ('inactivo', 'Inactivo')], default='activo')
+    last_login = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return f"{self.nombre} {self.apellido} ({self.profesion.nombre})"
     
     def save(self, *args, **kwargs):
-        if not self.id or not self._state.adding and not check_password(self.contrasena, self.contrasena):  # Solo encriptar si no está encriptada
+        if not self.id or (not self._state.adding and not self.contrasena.startswith('$')):
             self.contrasena = make_password(self.contrasena)
         super(Profesional, self).save(*args, **kwargs)
     

@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from django.http import JsonResponse
 from django.utils import timezone
 from django.shortcuts import render, redirect
 from app.models import Servicio, Profesional, Reserva, Subcategoria
@@ -47,6 +48,20 @@ def crear_reserva(request):
             'profesionales': profesionales,
             'precio_servicio': 0,
         })
+    
+def reservas_json(request):
+    reservas = Reserva.objects.all()
+    eventos = []
+
+    for reserva in reservas:
+        eventos.append({
+            'title': f"Reserva de {reserva.usuario.username}",
+            'start': reserva.fecha.isoformat(),
+            'color': '#f7a8b8' if reserva.estado == 'pendiente' else '#9b59b6',
+            'textColor': '#663399'
+        })
+
+    return JsonResponse(eventos, safe=False)
 
 
 @login_required

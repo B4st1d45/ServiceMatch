@@ -20,9 +20,9 @@ def login_profesional(request):
 
         # Verificar la contraseña
         if profesional.check_password(password):
-            auth_login(request, profesional)
-            messages.success(request, f'Bienvenido {profesional.nombre}')
-            return redirect('dashboard_profesional')
+            request.session['profesional_id'] = profesional.id
+            messages.success(request, f'Bienvenid@ {profesional.nombre}')
+            return redirect('profesional_home')
         else:
             messages.error(request, 'Contraseña incorrecta.')
             return redirect('login_profesional')

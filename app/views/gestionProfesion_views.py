@@ -68,15 +68,22 @@ def actualizar_profesion(request, servicio_id):
         nuevas_subcategorias_precios = request.POST.getlist('nueva_subcategoria_precio')
         nuevas_subcategorias_duraciones = request.POST.getlist('nueva_subcategoria_duracion')
 
+        print("Nombres:", nuevas_subcategorias_nombres)
+        print("Precios:", nuevas_subcategorias_precios)
+        print("Duraciones:", nuevas_subcategorias_duraciones)
+
         for nombre, precio, duracion in zip(nuevas_subcategorias_nombres, nuevas_subcategorias_precios, nuevas_subcategorias_duraciones):
-            if nombre:  # Verifica que no esté vacío
+            if nombre and precio and duracion:
                 nueva_subcategoria = Subcategoria(
                     nombre=nombre,
                     precio_base=precio,
                     duracion_estimada=duracion,
-                    servicio=servicio  # Aquí asignamos el servicio al que pertenece
+                    servicio=servicio
                 )
                 nueva_subcategoria.save()
+            else:
+                # Manejar el caso en que algún campo está vacío (puedes añadir un mensaje de error aquí)
+                print(f"Error: Falta algún campo (nombre: {nombre}, precio: {precio}, duracion: {duracion})")
 
         return redirect('detalle_servicio', servicio_id=servicio.id)
 
