@@ -1,0 +1,68 @@
+{% extends 'app/header.html' %}
+
+{% block title %}Perfil del Profesional{% endblock %}
+
+{% block content %}
+<div class="profile-view">
+    <h2>Mi Perfil</h2>
+    <div class="profile-field">
+        <strong>Nombre:</strong> <span id="nombre-text">{{ profesional.nombre }}</span>
+        <button onclick="editField('nombre')">Editar</button>
+    </div>
+    
+    <div class="profile-field">
+        <strong>Correo Electrónico:</strong> <span id="email-text">{{ profesional.email }}</span>
+        <button onclick="editField('email')">Editar</button>
+    </div>
+    
+    <div class="profile-field">
+        <strong>Teléfono:</strong> <span id="telefono-text">{{ profesional.telefono }}</span>
+        <button onclick="editField('telefono')">Editar</button>
+    </div>
+    
+    <div class="profile-field">
+        <strong>Experiencia:</strong> <span id="experiencia-text">{{ profesional.experiencia }}</span>
+        <button onclick="editField('experiencia')">Editar</button>
+    </div>
+    
+    <div class="profile-field">
+        <strong>Habilidades:</strong> <span id="habilidades-text">{{ profesional.habilidades }}</span>
+        <button onclick="editField('habilidades')">Editar</button>
+    </div>
+</div>
+
+<!-- Modal para Editar Campo -->
+<div id="edit-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <form method="post" action="">
+            {% csrf_token %}
+            <label id="modal-label" for="edit-input"></label>
+            <input type="text" id="edit-input" name="new_value">
+            <button type="submit">Guardar Cambios</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Función para abrir el modal de edición
+    function editField(field) {
+        document.getElementById("edit-modal").style.display = "block";
+        const fieldLabelMap = {
+            "nombre": "Nombre",
+            "email": "Correo Electrónico",
+            "telefono": "Teléfono",
+            "experiencia": "Experiencia",
+            "habilidades": "Habilidades"
+        };
+        document.getElementById("modal-label").innerText = "Editar " + fieldLabelMap[field];
+        document.getElementById("edit-input").name = field;
+    }
+
+    // Función para cerrar el modal
+    function closeModal() {
+        document.getElementById("edit-modal").style.display = "none";
+    }
+</script>
+
+{% endblock %}

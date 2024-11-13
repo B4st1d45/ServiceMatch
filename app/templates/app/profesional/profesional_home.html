@@ -1,10 +1,91 @@
 {% extends 'app/header.html' %}
 
-{% block title %}Profesional Home{% endblock %}
+{% block title %}Que bueno verte! {% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1>Bienvenido {{ profesional.nombre }} {{ profesional.apellido }}</h1>
-    <!-- Contenido específico para el profesional -->
+<div class="admin-dashboard">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Gestión</h2>
+        <ul class="panel-btn">
+            <li><a href="{% url 'editar_perfil' %}" class="btn-sidebar">Editar Perfil</a></li>
+            <li><a href="#" class="btn-sidebar">Calendario de Reservas</a></li>
+            <li><a href="#" class="btn-sidebar">Historial de Reservas</a></li>
+            <li><a href="#" class="btn-sidebar">Feedback Recibido</a></li>
+            <li><a href="#" class="btn-sidebar">Ayuda y Soporte</a></li>
+        </ul>
+        
+    </div>
+
+    <div class="main-content">
+        <!-- Sección de disponibilidad -->
+        <div class="availability-section">
+            <h2>Disponibilidad</h2>
+            <form method="post" action="" class="availability-form">
+                {% csrf_token %}
+                <label for="disponibilidad">Estado:</label>
+                <select name="disponibilidad" id="disponibilidad">
+                    <option value="1" {% if profesional.disponible %}selected{% endif %}>Disponible</option>
+                    <option value="0" {% if not profesional.disponible %}selected{% endif %}>No Disponible</option>
+                </select>
+                <button type="submit" class="availability-button">Actualizar</button>
+            </form>
+        </div>
+
+        <!-- reservas -->
+        <div class="resumen-section">
+            <h2>Próximas Reservas</h2>
+            <ul class="reservation-list">
+                {% for reserva in reservas_semana %}
+                <li class="reservation-item">
+                    <h4>{{ reserva.usuario.nombre }} {{ reserva.usuario.apellido }} - {{ reserva.subcategoria.nombre }}</h4>
+                    <p>{{ reserva.fecha|date:"d M Y" }} a las {{ reserva.fecha|date:"h:i a" }}</p>
+                </li>
+                {% empty %}
+                <li class="reservation-item">No tienes reservas programadas esta semana.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- métricas -->
+        <div class="card-container">
+            <div class="card">
+                <h4>Reservas del Mes</h4>
+                <p>{{ reservas_mes }}</p>
+            </div>
+            <div class="card">
+                <h4>Calificación Promedio</h4>
+                <p id="rating-stars" class="rating">{{ calificacion_promedio }}</p>
+            </div>
+            <div class="card">
+                <h4>Clientes atendidos</h4>
+                <p>{{ clientes_atendidos }}</p>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+    const rating = 4.5;
+    //const rating = {{ calificacion_promedio|floatformat:1 }};
+    const starContainer = document.getElementById("rating-stars");
+
+    //starContainer.innerHTML = '';
+
+    // Generar estrellas
+    for (let i = 1; i <= 5; i++) {
+        const star = document.createElement("span");
+        star.classList.add("star");
+        star.innerHTML = "&#9733;";
+
+        // Rellenar según el valor de `rating`
+        if (i <= Math.floor(rating)) {
+            star.classList.add("filled");
+        } else if (i - rating < 1) {
+            star.classList.add("half-filled");
+        }
+        
+        starContainer.appendChild(star);
+    }
+</script>
 {% endblock %}

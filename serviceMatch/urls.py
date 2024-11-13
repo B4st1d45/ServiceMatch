@@ -44,7 +44,9 @@ urlpatterns = [
     path('eliminar_profesion/<int:servicio_id>/', views.eliminar_profesion, name='eliminar_profesion'),
 
     path('login_profesional/', views.login_profesional, name='login_profesional'),
-    path('dashboard_profesional/', views.dashboard_profesional, name='dashboard_profesional'),
+    # path('dashboard_profesional/', views.dashboard_profesional, name='dashboard_profesional'),
+    path('profesional_home/', views.profesional_home, name='profesional_hoome'),
+    path('editar_perfil/', views.editar_perfil, name='editar_perfil'),
     
     path('crear_reserva/', views.crear_reserva, name='crear_reserva'),
     path('ver-mis-reservas/', views.ver_mis_reservas, name='ver_mis_reservas'),

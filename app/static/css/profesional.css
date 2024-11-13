@@ -1,0 +1,122 @@
+.rating .star {
+    font-size: 24px;
+    color: #C5C9E0;
+}
+.rating .star.filled {
+    color: #630D3B;
+}
+.rating .star.half-filled {
+    color: #630D3B;
+    background: linear-gradient(90deg, #630D3B 50%, #C5C9E0 50%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.availability-section, .resumen-section {
+    margin: 20px 0;
+}
+
+.availability-form select, .availability-button {
+    padding: 8px 12px;
+    font-size: 16px;
+    border: 1px solid #C5C9E0;
+    border-radius: 4px;
+}
+
+.availability-button {
+    background-color: #630D3B;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.availability-button:hover {
+    background-color: #460929;
+}
+
+.reservation-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.reservation-item {
+    background-color: #f9f9f9;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.reservation-item h4 {
+    font-size: 18px;
+    margin: 0;
+}
+
+.reservation-item p {
+    font-size: 14px;
+    color: #555;
+}
+
+/* editar perfil */
+.profile-view {
+    width: 100%;
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #E9E3FF;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-view h2 {
+    text-align: center;
+    color: #431F32;
+    margin-bottom: 20px;
+    font-family: 'Arial', sans-serif;
+}
+
+.profile-view .profile-field {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.profile-view .profile-field button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    background-color: #5b3d8b;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+/* Estilos para el modal */
+.modal {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}

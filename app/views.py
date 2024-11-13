@@ -105,6 +105,9 @@ def terminos(request):
 def admin_home(request):
     return render(request, 'app/admin/admin_home.html')
 
+def profesional_home(request):
+    return render(request, 'app/profesional/profesional_home.html')
+
 # gestionar profesionales
 def gestionar_profesionales(request):
     profesionales = Profesional.objects.all()

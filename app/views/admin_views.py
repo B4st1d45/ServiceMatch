@@ -1,6 +1,8 @@
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
+
+from app.models import Profesional, Reserva
 
 def es_admin(user):
     if user.is_authenticated and user.is_superuser:
