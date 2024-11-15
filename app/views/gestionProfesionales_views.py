@@ -24,6 +24,7 @@ def agregar_profesional(request):
         apellido = request.POST.get('apellido')
         email = request.POST.get('email')
         telefono = request.POST.get('telefono')
+        rut = request.POST.get('rut')
         contrasena = request.POST.get('contrasena')
         profesion_id = request.POST.get('profesion')
 
@@ -31,15 +32,17 @@ def agregar_profesional(request):
             rol_profesional = get_object_or_404(Rol, nombre='profesional')
             profesion = get_object_or_404(Servicio, id=profesion_id)
 
-            profesional = Profesional.objects.create(
+            profesional = Profesional.objects.create_user(
+                username=email,
                 nombre=nombre,
                 apellido=apellido,
                 profesion=profesion,
                 email=email,
                 telefono=telefono,
-                contrasena=make_password(contrasena),
-                rol=rol_profesional
+                rut=rut,
+                password=contrasena  # Utilizar create_user para manejar la contraseña
             )
+            profesional.rol = rol_profesional
             profesional.save()
 
             messages.success(request, 'Profesional agregado exitosamente.')
@@ -55,6 +58,7 @@ def agregar_profesional(request):
     return render(request, 'app/admin/agregar_profesionales.html', {
         'profesiones': profesiones  
     })  
+
     
 @user_passes_test(es_admin)
 def actualizar_profesional(request, profesional_id):
@@ -65,6 +69,7 @@ def actualizar_profesional(request, profesional_id):
         apellido = request.POST.get('apellido')
         email = request.POST.get('email')
         telefono = request.POST.get('telefono')
+        rut = request.POST.get('rut')  # Nuevo campo RUT
         profesion_id = request.POST.get('profesion')
 
         profesion = get_object_or_404(Servicio, id=profesion_id)
@@ -73,6 +78,7 @@ def actualizar_profesional(request, profesional_id):
         profesional.apellido = apellido
         profesional.email = email
         profesional.telefono = telefono
+        profesional.rut = rut  # Nuevo campo RUT
         profesional.profesion = profesion
         profesional.save()
 
@@ -90,4 +96,4 @@ def eliminar_profesional(request, profesional_id):
     if request.method == 'POST':
         profesional.delete()
         return redirect('gestionar_profesionales')  
-    return render(request, 'app/admin/eliminar_profesional.html', {'profesional': profesional})
+    return render(request, 'app/admin/eliminar_profesional.html', {'profesional': profesional}) 

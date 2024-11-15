@@ -12,16 +12,31 @@ class Rol(models.Model):
     def __str__(self):
         return self.nombre
 
+
 class Usuario(AbstractUser):
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     telefono = models.CharField(max_length=20)
     direccion = models.CharField(max_length=255)
+    rut = models.CharField(max_length=12, unique=True, default='00000000-0')
     rol = models.ForeignKey(Rol, on_delete=models.CASCADE)
+
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='usuario_set',  # Cambiamos related_name
+        blank=True
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='usuario_set',  # Cambiamos related_name
+        blank=True
+    )
 
     def __str__(self):
         return f"{self.nombre} {self.apellido} ({self.rol})"
+
+
 
 class Servicio(models.Model):
     nombre = models.CharField(max_length=100)
@@ -30,28 +45,31 @@ class Servicio(models.Model):
         return self.nombre
 
 
-class Profesional(models.Model):
+class Profesional(AbstractUser):
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
     profesion = models.ForeignKey(Servicio, on_delete=models.CASCADE)
-    email = models.EmailField(unique=True)
     telefono = models.CharField(max_length=20)
-    contrasena = models.CharField(max_length=128)
-    rol = models.ForeignKey(Rol, on_delete=models.CASCADE)
+    rut = models.CharField(max_length=12, unique=True, default='00000000-0')
     estado = models.CharField(max_length=10, choices=[('activo', 'Activo'), ('inactivo', 'Inactivo')], default='activo')
     last_login = models.DateTimeField(default=timezone.now)
+    
+    # Definir un valor por defecto para password
+    password = models.CharField(max_length=128, default='default_password')
+
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='profesional_set',
+        blank=True
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='profesional_set',
+        blank=True
+    )
 
     def __str__(self):
         return f"{self.nombre} {self.apellido} ({self.profesion.nombre})"
-    
-    def save(self, *args, **kwargs):
-        if not self.id or (not self._state.adding and not self.contrasena.startswith('$')):
-            self.contrasena = make_password(self.contrasena)
-        super(Profesional, self).save(*args, **kwargs)
-    
-    def check_password(self, raw_password):
-        return check_password(raw_password, self.contrasena)
-
 
 
 class Subcategoria(models.Model):
@@ -108,4 +126,4 @@ class Reseña(models.Model):
     fecha = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Reseña de {self.usuario} para {self.professional} - {self.calificacion} estrellas"
+        return f"Reseña de {self.usuario} para {self.profesional} - {self.calificacion} estrellas"

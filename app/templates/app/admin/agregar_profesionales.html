@@ -10,7 +10,7 @@
                 <form method="post">
                     {% csrf_token %}
                     <div class="form-group mb-3">
-                        <label for="rut" class="form-label">Nombre:</label>
+                        <label for="rut" class="form-label">RUT:</label>
                         <input type="text" id="rut" name="rut" class="form-control" required>
                     </div>
                     <div class="form-group mb-3">
@@ -22,14 +22,12 @@
                         <input type="text" id="apellido" name="apellido" class="form-control" required>
                     </div>
                     <div class="form-group mb-3">
-                        <div class="form-group mb-3">
-                            <label for="profesion" class="form-label">Profesión:</label>
-                            <select id="profesion" name="profesion" class="form-select" required>
-                                {% for profesion in profesiones %}
-                                    <option value="{{ profesion.id }}">{{ profesion.nombre }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                        <label for="profesion" class="form-label">Profesión:</label>
+                        <select id="profesion" name="profesion" class="form-select" required>
+                            {% for profesion in profesiones %}
+                                <option value="{{ profesion.id }}">{{ profesion.nombre }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="form-group mb-3">
                         <label for="email" class="form-label">Email:</label>

@@ -7,8 +7,6 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth import authenticate, login as auth_login
 
 
-
-
 @csrf_protect
 def user_login(request):
     list(messages.get_messages(request))
@@ -43,7 +41,6 @@ def user_login(request):
     return render(request, 'app/auth/login.html')
 
 
-
 def user_logout(request):
     list(messages.get_messages(request))
     auth_logout(request)
@@ -59,6 +56,7 @@ def user_register(request):
         email = request.POST.get('email')
         telefono = request.POST.get('phone')
         direccion = request.POST.get('address')
+        rut = request.POST.get('rut')  # Nuevo campo RUT
         password = request.POST.get('password')
         confirmar_password = request.POST.get('password_confirmation')
 
@@ -70,6 +68,11 @@ def user_register(request):
         # Verificar si el email ya existe
         if Usuario.objects.filter(email=email).exists():
             messages.error(request, 'El correo electrónico ya está registrado.')
+            return redirect('register')
+
+        # Verificar si el RUT ya existe
+        if Usuario.objects.filter(rut=rut).exists():
+            messages.error(request, 'El RUT ya está registrado.')
             return redirect('register')
 
         # Obtener el rol 'cliente'
@@ -87,6 +90,7 @@ def user_register(request):
             email=email,
             telefono=telefono,
             direccion=direccion,
+            rut=rut,  
         )
         usuario.set_password(password)  # Esto maneja la encriptación
 
