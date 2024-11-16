@@ -6,7 +6,6 @@ from django.contrib.auth import logout as auth_logout
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth import authenticate, login as auth_login
 
-
 @csrf_protect
 def user_login(request):
     list(messages.get_messages(request))
@@ -14,15 +13,10 @@ def user_login(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        # Verificar el email
-        try:
-            usuario = Usuario.objects.get(email=email)
-        except Usuario.DoesNotExist:
-            messages.error(request, 'El correo electrónico no está registrado.')
-            return redirect('login')
-        
-        # Verificar la contraseña
-        if usuario.check_password(password):
+        # Intentar autenticar al usuario
+        usuario = authenticate(request, username=email, password=password)
+
+        if usuario is not None:
             auth_login(request, usuario)
             messages.success(request, f'Bienvenido {usuario.nombre}')
             
@@ -35,11 +29,10 @@ def user_login(request):
                 messages.error(request, 'Rol de usuario no válido.')
                 return redirect('login')
         else:
-            messages.error(request, 'Contraseña incorrecta.')
+            messages.error(request, 'Correo electrónico o contraseña incorrectos.')
             return redirect('login')
 
     return render(request, 'app/auth/login.html')
-
 
 def user_logout(request):
     list(messages.get_messages(request))

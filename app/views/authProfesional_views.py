@@ -20,7 +20,7 @@ def login_profesional(request):
 
         # Verificar la contraseña
         if profesional.check_password(password):
-            request.session['profesional_id'] = profesional.id
+            auth_login(request, profesional)
             messages.success(request, f'Bienvenid@ {profesional.nombre}')
             return redirect('profesional_home')
         else:
