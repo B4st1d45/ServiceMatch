@@ -79,3 +79,9 @@ def eliminar_reserva(request, reserva_id):
         messages.success(request, 'Reserva eliminada exitosamente.')
         return redirect('ver_mis_reservas')
     return render(request, 'app//cliente/eliminar_reserva.html', {'reserva': reserva})
+
+
+
+def reservas_totales(request):
+    reservas = Reserva.objects.select_related('profesional', 'usuario').all()
+    return render(request, 'app/admin/reservas_totales.html', {'reservas': reservas})

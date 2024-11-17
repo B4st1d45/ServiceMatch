@@ -45,6 +45,8 @@ urlpatterns = [
     path('actualizar_profesion/<int:servicio_id>/', views.actualizar_profesion, name='actualizar_profesion'),
     path('eliminar_profesion/<int:servicio_id>/', views.eliminar_profesion, name='eliminar_profesion'),
 
+    path('reservas_totales/', views.reservas_totales, name='reservas_totales'),
+
     path('dashboard_profesional/', views.dashboard_profesional, name='dashboard_profesional'),
     path('profesional_home/', views.profesional_home, name='profesional_home'),
     path('editar_perfil/', views.editar_perfil, name='editar_perfil'),
@@ -58,4 +60,9 @@ urlpatterns = [
     path('estadisticas/', views.obtener_estadisticas_reservas, name='estadisticas_reservas'),
     path('estadisticas/tarjetas/', obtener_estadisticas_tarjetas , name='obtener_estadisticas_tarjetas'),
     path('filtro_reservas/', views.filtrar_reservas, name='filtrar_reservas'),
+    
+    path('cliente_home/', views.cliente_home, name='cliente_home'),
+    path('actualizar_cliente/', views.actualizar_cliente, name='actualizar_cliente'),
+    
+    
 ]

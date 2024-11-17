@@ -1,0 +1,29 @@
+{% extends 'app/header.html' %}
+
+{% block title %}Reservas Totales{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Reservas Totales</h2>
+    <table class="table table-hover table-bordered table-responsive-md text-center shadow">
+        <thead class="bg-dark text-white">
+            <tr>
+                <th scope="col">Profesional</th>
+                <th scope="col">Cliente</th>
+                <th scope="col">Fecha</th>
+                <th scope="col">Hora</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reserva in reservas %}
+            <tr>
+                <td>{{ reserva.profesional.nombre }} {{ reserva.profesional.apellido }}</td>
+                <td>{{ reserva.usuario.nombre }} {{ reserva.usuario.apellido }}</td>
+                <td>{{ reserva.fecha|date:"d/m/Y" }}</td>
+                <td>{{ reserva.fecha|date:"H:i" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

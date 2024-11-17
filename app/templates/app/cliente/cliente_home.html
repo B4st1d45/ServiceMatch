@@ -1,0 +1,72 @@
+{% extends 'app/header.html' %}
+
+{% block title %}Bienvenido, Cliente{% endblock %}
+
+{% block content %}
+<div class="cliente-dashboard">
+    <!-- Columna Izquierda: Sidebar -->
+    <div class="sidebar">
+        <h2>Gestión del Perfil</h2>
+        <ul class="panel-btn">
+            <li><a href="#" class="btn-sidebar">Estadísticas Personales</a></li>
+            <li><a href="{% url 'ver_mis_reservas' %}" class="btn-sidebar">Mis Reservas</a></li>
+            <li><a href="{% url 'actualizar_cliente' %}" class="btn-sidebar">Actualizar Información</a></li>
+        </ul>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="main-content">
+        <h3>Estadísticas Personales</h3>
+        <input type="date" id="datePicker" class="date-picker">
+
+        <div class="card-container">
+            <div class="card">
+                <h4>Reservas Totales</h4>
+                <p>{{ reservas_totales }}</p>
+            </div>
+            <div class="card">
+                <h4>Reservas Completadas</h4>
+                <p>{{ reservas_completadas }}</p>
+            </div>
+            <div class="card">
+                <h4>Reservas Pendientes</h4>
+                <p>{{ reservas_pendientes }}</p>
+            </div>
+        </div>  
+
+        <!-- Tabla de Reservas -->
+        <div class="table-responsive mt-5">
+            <h4>Mis Reservas</h4>
+            <table class="table table-hover table-bordered text-center shadow">
+                <thead class="bg-dark text-white">
+                    <tr>
+                        <th scope="col">Profesional</th>
+                        <th scope="col">Servicio</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Hora</th>
+                        <th scope="col">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reserva in reservas %}
+                    <tr>
+                        <td>{{ reserva.profesional.nombre }} {{ reserva.profesional.apellido }}</td>
+                        <td>{{ reserva.subcategoria.nombre }}</td>
+                        <td>{{ reserva.fecha|date:"d/m/Y" }}</td>
+                        <td>{{ reserva.fecha|date:"H:i" }}</td>
+                        <td>{{ reserva.estado }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Obtener la fecha de hoy en el formato YYYY-MM-DD
+    const today = new Date().toISOString().split('T')[0];
+    // Establecer el valor del input
+    document.getElementById("datePicker").value = today;
+</script>
+{% endblock %}

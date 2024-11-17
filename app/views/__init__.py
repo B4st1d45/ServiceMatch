@@ -8,3 +8,4 @@ from .inicio_views import *
 from .profesional_views import *
 from .reserva_views import *
 from .gestionReservas_views import *
+from .cliente_views import *

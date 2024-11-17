@@ -54,6 +54,9 @@
                         <li><a href="{% url 'register' %}" class="btn btn-register">Registrarse</a></li>
                         <li><a href="{% url 'login_profesional' %}" class="btn btn-register">Profesional</a></li>
                     {% else %}
+                        {% if user.rol.nombre == 'cliente' %}
+                            <li><a href="{% url 'cliente_home' %}" class="navbar-text">Hola, {{ user.nombre }}</a></li>
+                        {% endif %}
                         <li><a href="{% url 'logout' %}" class="btn btn-logout">Cerrar Sesión</a></li>
                     {% endif %}
                 </ul>
