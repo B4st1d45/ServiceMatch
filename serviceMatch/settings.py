@@ -29,6 +29,7 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = 'app.Usuario'  # Define Usuario como el modelo principal
+AUTH_USER_MODEL = 'app.Profesional'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
