@@ -6,7 +6,6 @@ from django.views.decorators.csrf import csrf_protect
 
 @csrf_protect
 def login_profesional(request):
-    list(messages.get_messages(request))
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')

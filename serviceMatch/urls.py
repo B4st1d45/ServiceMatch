@@ -52,6 +52,7 @@ urlpatterns = [
     path('editar_perfil_profesional/', views.editar_perfil_profesional, name='editar_perfil_profesional'),
     path('calendario_profesional/', views.calendario_reservas, name='calendario_reservas'),
     path('reservas/json/', views.reservas_json, name='reservas_json'),
+     path('editar-disponibilidad/', views.editar_disponibilidad, name='editar_disponibilidad'),
     
     path('crear_reserva/', views.crear_reserva, name='crear_reserva'),
     path('ver-mis-reservas/', views.ver_mis_reservas, name='ver_mis_reservas'),

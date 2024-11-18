@@ -22,12 +22,12 @@
         <!-- Sección de disponibilidad -->
         <div class="availability-section">
             <h2>Disponibilidad</h2>
-            <form method="post" action="" class="availability-form">
+            <form method="post" action="{% url 'editar_disponibilidad' %}" class="availability-form">
                 {% csrf_token %}
-                <label for="disponibilidad">Estado:</label>
-                <select name="disponibilidad" id="disponibilidad">
-                    <option value="1" {% if profesional.disponible %}selected{% endif %}>Disponible</option>
-                    <option value="0" {% if not profesional.disponible %}selected{% endif %}>No Disponible</option>
+                <label for="estado">Estado:</label>
+                <select name="estado" id="estado">
+                    <option value="activo" {% if profesional.estado == 'activo' %}selected{% endif %}>Activo</option>
+                    <option value="inactivo" {% if profesional.estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
                 </select>
                 <button type="submit" class="availability-button">Actualizar</button>
             </form>

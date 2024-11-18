@@ -59,6 +59,7 @@ def dashboard_profesional(request):
 
     return render(request, 'app/dashboard_profesional.html', context)
 
+@login_required
 def editar_perfil_profesional(request):
     if request.user.rol != 'profesional':
         return redirect('home')
@@ -119,3 +120,23 @@ def calendario_reservas(request):
         return render(request, 'app/profesional/calendario_reservas.html', {'reservas': reservas})
     else:
         return redirect('login')
+
+@login_required
+def editar_disponibilidad(request):
+    if request.user.rol != 'profesional':
+        return redirect('home')
+
+    profesional = request.user
+
+    if request.method == 'POST':
+        estado = request.POST.get('estado')
+        
+        # Actualizar el estado (activo/inactivo)
+        if estado in ['activo', 'inactivo']:
+            profesional.estado = estado
+            profesional.save()
+            messages.success(request, 'Estado de disponibilidad actualizado con éxito.')
+
+        return redirect('profesional_home')
+
+    return render(request, 'app/profesional/editar_disponibilidad.html', {'profesional': profesional})
