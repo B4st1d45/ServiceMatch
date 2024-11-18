@@ -1,3 +1,4 @@
+from django.http import HttpResponseForbidden
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from app.models import Reserva, Usuario, Reseña
@@ -9,6 +10,11 @@ from django.shortcuts import render, get_object_or_404
 @login_required
 def cliente_home(request):
     cliente = request.user
+    reservas = Reserva.objects.filter(usuario=cliente)
+
+    if cliente.rol != 'cliente':
+        return HttpResponseForbidden("No tienes permisos para acceder a esta página.")
+
     reservas = Reserva.objects.filter(usuario=cliente)
     
     reservas_totales = reservas.count()
