@@ -1,6 +1,6 @@
 {% extends 'app/header.html' %}
 
-{% block title %}Perfil del Profesional{% endblock %}
+{% block title %}Calendario de Reservas{% endblock %}
 
 {% block content %}
 <div class="admin-dashboard">
@@ -9,7 +9,7 @@
         <h2>Gestión</h2>
         <ul class="panel-btn">
             <li><a href="{% url 'profesional_home' %}" class="btn-sidebar">Inicio</a></li>
-            <li><a href="{% url 'editar_perfil' %}" class="btn-sidebar">Editar Perfil</a></li>
+            <li><a href="{% url 'editar_perfil_profesional' %}" class="btn-sidebar">Editar Perfil</a></li>
             <li><a href="{% url 'calendario_reservas' %}" class="btn-sidebar">Calendario de Reservas</a></li>
             <li><a href="#" class="btn-sidebar">Historial de Reservas</a></li>
             <li><a href="#" class="btn-sidebar">Feedback Recibido</a></li>
@@ -44,7 +44,7 @@
             buttonText: {
                 today: 'Hoy'
             },
-            events: '/reservas/json/',  // Corrige aquí
+            events: '{% url "reservas_json" %}',
             eventClick: function(info) {
                 document.getElementById('modalContent').innerText = 
                     `${info.event.title} el ${info.event.start.toLocaleString()}`;

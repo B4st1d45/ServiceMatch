@@ -1,82 +1,51 @@
 {% extends 'app/header.html' %}
 
-{% block title %}Perfil del Profesional{% endblock %}
+{% block title %}Actualizar Información del Profesional{% endblock %}
 
 {% block content %}
-<div class="admin-dashboard">
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h2>Gestión</h2>
-        <ul class="panel-btn">
-            <li><a href="{% url 'profesional_home' %}" class="btn-sidebar">Inicio</a></li>
-            <li><a href="{% url 'editar_perfil' %}" class="btn-sidebar">Editar Perfil</a></li>
-            <li><a href="{% url 'calendario_reservas' %}" class="btn-sidebar">Calendario de Reservas</a></li>
-            <li><a href="#" class="btn-sidebar">Historial de Reservas</a></li>
-            <li><a href="#" class="btn-sidebar">Feedback Recibido</a></li>
-            <li><a href="#" class="btn-sidebar">Ayuda y Soporte</a></li>
-        </ul>
-        
-    </div>
-    <div class="profile-view">
-        <h2>Mi Perfil</h2>
-        <div class="profile-field">
-            <strong>Nombre:</strong> <span id="nombre-text">{{ profesional.nombre }}</span>
-            <button onclick="editField('nombre')">Editar</button>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Actualizar Información del Profesional</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    Actualizar Información
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-group mb-3">
+                            <label for="nombre" class="form-label">Nombre:</label>
+                            <input type="text" id="nombre" name="nombre" class="form-control" value="{{ profesional.nombre }}" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="apellido" class="form-label">Apellido:</label>
+                            <input type="text" id="apellido" name="apellido" class="form-control" value="{{ profesional.apellido }}" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="telefono" class="form-label">Teléfono:</label>
+                            <input type="text" id="telefono" name="telefono" class="form-control" value="{{ profesional.telefono }}" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="email" class="form-label">Email:</label>
+                            <input type="email" id="email" name="email" class="form-control" value="{{ profesional.email }}" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="nueva_contrasena" class="form-label">Nueva Contraseña:</label>
+                            <input type="password" id="nueva_contrasena" name="nueva_contrasena" class="form-control">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="confirmar_contrasena" class="form-label">Confirmar Nueva Contraseña:</label>
+                            <input type="password" id="confirmar_contrasena" name="confirmar_contrasena" class="form-control">
+                        </div>
+                        <div class="form-actions text-center">
+                            <button type="submit" class="btn btn-primary">Actualizar</button>
+                            <a href="{% url 'profesional_home' %}" class="btn btn-secondary ms-2">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        
-        <div class="profile-field">
-            <strong>Correo Electrónico:</strong> <span id="email-text">{{ profesional.email }}</span>
-            <button onclick="editField('email')">Editar</button>
-        </div>
-        
-        <div class="profile-field">
-            <strong>Teléfono:</strong> <span id="telefono-text">{{ profesional.telefono }}</span>
-            <button onclick="editField('telefono')">Editar</button>
-        </div>
-        
-        <div class="profile-field">
-            <strong>Experiencia:</strong> <span id="experiencia-text">{{ profesional.experiencia }}</span>
-            <button onclick="editField('experiencia')">Editar</button>
-        </div>
-        
-        <div class="profile-field">
-            <strong>Habilidades:</strong> <span id="habilidades-text">{{ profesional.habilidades }}</span>
-            <button onclick="editField('habilidades')">Editar</button>
-        </div>
-    </div>
-</div>
-<!-- Modal para Editar Campo -->
-<div id="edit-modal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <form method="post" action="">
-            {% csrf_token %}
-            <label id="modal-label" for="edit-input"></label>
-            <input type="text" id="edit-input" name="new_value">
-            <button type="submit">Guardar Cambios</button>
-        </form>
     </div>
 </div>
-
-<script>
-    // Función para abrir el modal de edición
-    function editField(field) {
-        document.getElementById("edit-modal").style.display = "block";
-        const fieldLabelMap = {
-            "nombre": "Nombre",
-            "email": "Correo Electrónico",
-            "telefono": "Teléfono",
-            "experiencia": "Experiencia",
-            "habilidades": "Habilidades"
-        };
-        document.getElementById("modal-label").innerText = "Editar " + fieldLabelMap[field];
-        document.getElementById("edit-input").name = field;
-    }
-
-    // Función para cerrar el modal
-    function closeModal() {
-        document.getElementById("edit-modal").style.display = "none";
-    }
-</script>
-
 {% endblock %}
