@@ -1,12 +1,11 @@
-from datetime import datetime
-from django.http import JsonResponse
-from django.utils import timezone
-from django.shortcuts import render, redirect
-from app.models import Servicio, Usuario, Reserva, Subcategoria
-from django.shortcuts import get_object_or_404
-from django.contrib import messages
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ValidationError
+from django.contrib import messages
+from django.utils import timezone
+from datetime import datetime
+from django.core.exceptions import ValidationError 
+from app.models import Servicio, Subcategoria, Usuario, Reserva
+from django.http import JsonResponse
 
 
 @login_required
@@ -21,6 +20,7 @@ def crear_reserva(request):
         fecha_hora = datetime.strptime(f"{fecha} {hora}", '%Y-%m-%d %H:%M')
         fecha_hora = timezone.make_aware(fecha_hora)
 
+        # Obtener el profesional y subcategoría, asegurándose de que existen
         profesional = get_object_or_404(Usuario, id=profesional_id, rol='profesional')
         subcategoria = get_object_or_404(Subcategoria, id=subcategoria_id)
 
@@ -40,8 +40,9 @@ def crear_reserva(request):
         except ValidationError as e:
             messages.error(request, e.message)
             return redirect('crear_reserva')
-
+    
     else:
+        # Obtener todos los servicios y profesionales activos para la página de creación de reservas
         servicios = Servicio.objects.all()
         profesionales = Usuario.objects.filter(rol='profesional', estado='activo')
         return render(request, 'app/reserva/crear_reserva.html', {
@@ -49,7 +50,9 @@ def crear_reserva(request):
             'profesionales': profesionales,
             'precio_servicio': 0,
         })
-    
+
+
+
 def reservas_json(request):
     reservas = Reserva.objects.all()
     eventos = []
