@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_filters %}
 
 <!DOCTYPE HTML>
 <html>
@@ -56,6 +57,10 @@
                     {% else %}
                         {% if user.rol.nombre == 'cliente' %}
                             <li><a href="{% url 'cliente_home' %}" class="navbar-text">Hola, {{ user.nombre }}</a></li>
+                        {% elif user.rol.nombre == 'admin' %}
+                            <li><a href="{% url 'admin_home' %}" class="navbar-text">Hola, {{ user.nombre }}</a></li>
+                        {% elif user|is_profesional %}
+                            <li><a href="{% url 'profesional_home' %}" class="navbar-text">Hola, {{ user.nombre }}</a></li>
                         {% endif %}
                         <li><a href="{% url 'logout' %}" class="btn btn-logout">Cerrar Sesión</a></li>
                     {% endif %}
