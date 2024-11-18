@@ -1,3 +1,4 @@
+from django.http import HttpResponseForbidden
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from app.models import Reserva, Usuario, Reseña
@@ -10,11 +11,14 @@ from django.shortcuts import render, get_object_or_404
 def cliente_home(request):
     cliente = request.user
     reservas = Reserva.objects.filter(usuario=cliente)
-    
     reservas_totales = reservas.count()
     reservas_completadas = reservas.filter(estado='completada').count()
     reservas_pendientes = reservas.filter(estado='pendiente').count()
-    profesionales = Usuario.objects.filter(reservas_cliente__usuario=cliente, rol='profesional').distinct()
+
+    if cliente.rol != 'cliente':
+        return HttpResponseForbidden("No tienes permisos para acceder a esta página.")
+
+    profesionales = Usuario.objects.filter(reservas_cliente__usuario=cliente, rol='profesional').distinct().prefetch_related('reservas_cliente')
 
     for profesional in profesionales:
         profesional.reserva = reservas.filter(profesional=profesional).first()
@@ -71,6 +75,10 @@ def actualizar_cliente(request):
 @login_required
 def ver_reservas_profesional(request, profesional_id):
     profesional = get_object_or_404(Usuario, id=profesional_id)
+    
+    if request.user.rol != 'cliente':
+        return HttpResponseForbidden("No tienes permisos para acceder a esta página.")
+    
     reservas = Reserva.objects.filter(profesional=profesional)
     return render(request, 'app/cliente/ver_reservas_profesional.html', {'profesional': profesional, 'reservas': reservas})
 
@@ -82,6 +90,14 @@ def calificar_profesional(request, profesional_id):
     if request.method == 'POST':
         calificacion = request.POST.get('calificacion')
         comentario = request.POST.get('comentario')
+
+        if not calificacion or not calificacion.isdigit() or int(calificacion) not in [1, 2, 3, 4, 5]:
+            messages.error(request, 'La calificación debe estar entre 1 y 5 estrellas.')
+            return redirect('cliente_home')
+
+        if comentario and len(comentario) > 500:  # Limitar el tamaño del comentario
+            messages.error(request, 'El comentario no puede tener más de 500 caracteres.')
+            return redirect('cliente_home')
         
         if int(calificacion) not in [1, 2, 3, 4, 5]:
             messages.error(request, 'La calificación debe estar entre 1 y 5 estrellas.')

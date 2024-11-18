@@ -8,7 +8,7 @@ from django.utils import formats
 from django.http import JsonResponse
 
 def profesional_home(request):
-    if request.user.rol != 'profesional':
+    if not request.user.is_authenticated or request.user.rol != 'profesional':
         return redirect('home')
 
     today = datetime.today()
@@ -16,16 +16,16 @@ def profesional_home(request):
     end_of_week = start_of_week + timedelta(days=6)
 
     reservas_semana = Reserva.objects.filter(
-        usuario=request.user,
+        profesional=request.user,
         fecha__range=[start_of_week, end_of_week]
     ).order_by('fecha')
 
     reservas_mes = Reserva.objects.filter(
-        usuario=request.user,
+        profesional=request.user,
         fecha__month=today.month
     ).count()
 
-    '''calificaciones = Reseña.objects.filter(profesional=request.user)
+    calificaciones = Reseña.objects.filter(profesional=request.user)
     if calificaciones.exists():
         calificacion_promedio = calificaciones.aggregate(models.Avg('calificacion'))['calificacion__avg']
     else:
@@ -34,7 +34,7 @@ def profesional_home(request):
     clientes_atendidos = Reserva.objects.filter(
         profesional=request.user,
         estado='completada'
-    ).values('usuario').distinct().count()'''
+    ).values('usuario').distinct().count()
 
     context = {
         'reservas_semana': reservas_semana,

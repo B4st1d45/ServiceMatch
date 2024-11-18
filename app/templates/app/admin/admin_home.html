@@ -8,7 +8,7 @@
     <div class="sidebar">
         <h2>Gestión</h2>
         <ul class="panel-btn">
-            <li><a href="#" class="btn-sidebar">Estadísticas</a></li>
+            <li><a href="{% url 'admin_home' %}" class="btn-sidebar">Estadísticas</a></li>
             <li><a href="{% url 'reservas_totales' %}" class="btn-sidebar">Reservas</a></li>
             <li><a href="{% url 'gestionar_profesionales' %}" class="btn-sidebar">Gestionar Profesionales</a></li>
             <li><a href="{% url 'gestionar_profesion' %}" class="btn-sidebar">Gestionar Servicios</a></li>
@@ -54,7 +54,8 @@
 
 <script>
     function cargarGrafico() {
-        fetch("{% url 'estadisticas_reservas' %}")
+        const fecha = document.getElementById('datePicker').value;
+        fetch("{% url 'estadisticas_reservas' %}?fecha=" + fecha)
             .then(response => response.json())
             .then(data => {
                 var ctx = document.getElementById('myChart').getContext('2d');
