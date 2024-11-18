@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
-from app.models import Reserva, Usuario, Reseña, Profesional
+from app.models import Reserva, Usuario, Reseña
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404
 
@@ -14,7 +14,7 @@ def cliente_home(request):
     reservas_totales = reservas.count()
     reservas_completadas = reservas.filter(estado='completada').count()
     reservas_pendientes = reservas.filter(estado='pendiente').count()
-    profesionales = Profesional.objects.filter(reserva__usuario=cliente).distinct()
+    profesionales = Usuario.objects.filter(reserva__usuario=cliente, rol='profesional').distinct()
 
     for profesional in profesionales:
         profesional.reserva = reservas.filter(profesional=profesional).first()
@@ -51,10 +51,10 @@ def actualizar_cliente(request):
         cliente.email = email
 
         # Verificar si las contraseñas coinciden
-        if nueva_contrasena or confirmar_contrasena:
-            if nueva_contrasena != confirmar_contrasena:
+        if nueva_contrasena and nueva_contrasena != confirmar_contrasena:
                 messages.error(request, 'Las contraseñas no coinciden.')
                 return redirect('actualizar_cliente')
+        elif nueva_contrasena:
             cliente.set_password(nueva_contrasena)
 
         # Guardar los cambios
@@ -70,18 +70,22 @@ def actualizar_cliente(request):
 
 @login_required
 def ver_reservas_profesional(request, profesional_id):
-    profesional = get_object_or_404(Profesional, id=profesional_id)
+    profesional = get_object_or_404(Usuario, id=profesional_id)
     reservas = Reserva.objects.filter(profesional=profesional)
     return render(request, 'app/cliente/ver_reservas_profesional.html', {'profesional': profesional, 'reservas': reservas})
 
 
 @login_required
 def calificar_profesional(request, profesional_id):
-    profesional = get_object_or_404(Profesional, id=profesional_id)
+    profesional = get_object_or_404(Usuario, id=profesional_id)
 
     if request.method == 'POST':
         calificacion = request.POST.get('calificacion')
         comentario = request.POST.get('comentario')
+        
+        if int(calificacion) not in [1, 2, 3, 4, 5]:
+            messages.error(request, 'La calificación debe estar entre 1 y 5 estrellas.')
+            return redirect('cliente_home')
 
         cliente = request.user
 
