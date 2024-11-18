@@ -14,7 +14,7 @@ def cliente_home(request):
     reservas_totales = reservas.count()
     reservas_completadas = reservas.filter(estado='completada').count()
     reservas_pendientes = reservas.filter(estado='pendiente').count()
-    profesionales = Usuario.objects.filter(reserva__usuario=cliente, rol='profesional').distinct()
+    profesionales = Usuario.objects.filter(reservas_cliente__usuario=cliente, rol='profesional').distinct()
 
     for profesional in profesionales:
         profesional.reserva = reservas.filter(profesional=profesional).first()

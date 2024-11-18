@@ -1,5 +1,4 @@
 {% load static %}
-{% load custom_filters %}
 
 <!DOCTYPE HTML>
 <html>
@@ -51,18 +50,18 @@
                     
                     <!-- Botones de inicio de sesión/registro -->
                     {% if not user.is_authenticated %}
-                        <li><a href="{% url 'login' %}" class="btn btn-login">Iniciar Sesión</a></li>
-                        <li><a href="{% url 'register' %}" class="btn btn-register">Registrarse</a></li>
-                        <li><a href="{% url 'login_profesional' %}" class="btn btn-register">Profesional</a></li>
+                    <li><a href="{% url 'login' %}" class="btn btn-login">Iniciar Sesión</a></li>
+                    <li><a href="{% url 'register' %}" class="btn btn-register">Registrarse</a></li>
+                    <li><a href="{% url 'login_profesional' %}" class="btn btn-register">Profesional</a></li>
                     {% else %}
-                        {% if user.rol.nombre == 'cliente' %}
-                            <li><a href="{% url 'cliente_home' %}" class="navbar-text">Hola, {{ user.nombre }}</a></li>
-                        {% elif user.rol.nombre == 'admin' %}
-                            <li><a href="{% url 'admin_home' %}" class="navbar-text">Hola, {{ user.nombre }}</a></li>
-                        {% elif user|is_profesional %}
-                            <li><a href="{% url 'profesional_home' %}" class="navbar-text">Hola, {{ user.nombre }}</a></li>
-                        {% endif %}
-                        <li><a href="{% url 'logout' %}" class="btn btn-logout">Cerrar Sesión</a></li>
+                    {% if user.rol == 'cliente' %}
+                        <li><a href="{% url 'cliente_home' %}" class="navbar-text">Hola, {{ user.nombre }}</a></li>
+                    {% elif user.rol == 'admin' %}
+                        <li><a href="{% url 'admin_home' %}" class="navbar-text">Hola, {{ user.nombre }}</a></li>
+                    {% elif user.rol == 'profesional' %}
+                        <li><a href="{% url 'profesional_home' %}" class="navbar-text">Hola, {{ user.nombre }}</a></li>
+                    {% endif %}
+                    <li><a href="{% url 'logout' %}" class="btn btn-logout">Cerrar Sesión</a></li>
                     {% endif %}
                 </ul>
             </div>

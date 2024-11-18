@@ -13,63 +13,39 @@
             <input type="text" id="nombre" name="nombre" class="form-control" value="{{ servicio.nombre }}" required>
         </div>
 
-        <div class="form-group mb-3">
-            <label for="subcategoria-select" class="form-label">Selecciona Subcategoría para Editar:</label>
-            <select id="subcategoria-select" class="form-control">
-                <option value="" disabled selected>Selecciona una subcategoría</option>
-                {% for subcategoria in subcategorias_existentes %}
-                        <option value="{{ subcategoria.id }}">{{ subcategoria.nombre }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div id="subcategoria-fields" class="border rounded p-3 mb-3" style="display: none;">
-            <input type="hidden" id="subcategoria-id" name="subcategoria_id">
+        <!-- Subcategorías Existentes -->
+        {% for subcategoria in subcategorias_existentes %}
+        <div class="border rounded p-3 mb-3">
+            <h5>Subcategoría: {{ subcategoria.nombre }}</h5>
+            <input type="hidden" name="subcategoria_id" value="{{ subcategoria.id }}">
 
             <div class="form-group mb-2">
-                <label for="nombre_{{ subcategoria.id }}" class="form-label">Nombre de la Subcategoría:</label>
-                <input type="text" id="nombre_{{ subcategoria.id }}" name="nombre_{{ subcategoria.id }}" class="form-control" value="{{ subcategoria.nombre }}">
+                <label for="nombre_{{ subcategoria.id }}">Nombre:</label>
+                <input type="text" id="nombre_{{ subcategoria.id }}" name="nombre_{{ subcategoria.id }}" class="form-control" value="{{ subcategoria.nombre }}" required>
             </div>
 
             <div class="form-group mb-2">
-                <label for="precio_{{ subcategoria.id }}" class="form-label">Precio Base:</label>
-                <div class="input-group">
-                    <span class="input-group-text">$</span>
-                    <input type="number" step="1" min="0" id="precio_{{ subcategoria.id }}" name="precio_{{ subcategoria.id }}" class="form-control" value="{{ subcategoria.precio_base }}">
-                </div>
+                <label for="precio_{{ subcategoria.id }}">Precio Base:</label>
+                <input type="number" step="0.01" id="precio_{{ subcategoria.id }}" name="precio_{{ subcategoria.id }}" class="form-control" value="{{ subcategoria.precio_base }}" required>
             </div>
 
             <div class="form-group mb-2">
-                <label for="duracion_{{ subcategoria.id }}" class="form-label">Duración Estimada (horas):</label>
-                <input type="number" id="duracion_{{ subcategoria.id }}" name="duracion_{{ subcategoria.id }}" class="form-control" value="{{ subcategoria.duracion_estimada }}">
+                <label for="duracion_{{ subcategoria.id }}">Duración (horas):</label>
+                <input type="number" step="1" id="duracion_{{ subcategoria.id }}" name="duracion_{{ subcategoria.id }}" class="form-control" value="{{ subcategoria.duracion_estimada }}" required>
             </div>
 
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" name="eliminar_subcategoria" value="{{ subcategoria.id }}">
-                <label class="form-check-label">Eliminar Subcategoría</label>
+                <label class="form-check-label">Eliminar esta subcategoría</label>
             </div>
         </div>
+        {% endfor %}
 
-        <button type="button" id="add-subcategory-btn" class="btn btn-secondary mt-3">Añadir Subcategoría</button>
-        <div id="new-subcategory-fields" class="border rounded p-3 mt-3" style="display: none;">
-            <h5>Nueva Subcategoría</h5>
-            <div class="form-group mb-2">
-                <label for="nueva-subcategoria-nombre" class="form-label">Nombre de la Subcategoría:</label>
-                <input type="text" name="nueva_subcategoria_nombre" class="form-control">
-            </div>
-
-            <div class="form-group mb-2">
-                <label for="nueva-subcategoria-precio" class="form-label">Precio Base:</label>
-                <div class="input-group">
-                    <span class="input-group-text">$</span>
-                    <input type="number" step="1" min="0" name="nueva_subcategoria_precio" class="form-control">
-                </div>
-            </div>
-
-            <div class="form-group mb-2">
-                <label for="nueva-subcategoria-duracion" class="form-label">Duración Estimada (horas):</label>
-                <input type="number" name="nueva_subcategoria_duracion" class="form-control">
-            </div>
+        <!-- Agregar Nueva Subcategoría -->
+        <div id="new-subcategory-fields">
+            <h4>Nueva Subcategoría</h4>
+            <div id="new-subcategories-container"></div>
+            <button type="button" id="add-subcategory-btn" class="btn btn-secondary">+ Añadir Subcategoría</button>
         </div>
 
         <button type="submit" class="btn btn-primary mt-3">Actualizar Servicio</button> 
@@ -77,44 +53,32 @@
 </div>
 
 <script>
-    const select = document.getElementById('subcategoria-select');
-    const fieldsContainer = document.getElementById('subcategoria-fields');
-    const subcategoriaIdField = document.getElementById('subcategoria-id');
-    const subcategoriaNombreField = document.getElementById('subcategoria-nombre');
-    const subcategoriaPrecioField = document.getElementById('subcategoria-precio');
-    const subcategoriaDuracionField = document.getElementById('subcategoria-duracion');
-
-    const subcategorias = [
-        {% for subcategoria in subcategorias_existentes %}
-        {
-            id: "{{ subcategoria.id }}",
-            nombre: "{{ subcategoria.nombre }}",
-            precio: "{{ subcategoria.precio_base|floatformat:0 }}",
-            duracion: "{{ subcategoria.duracion_estimada }}"
-        },
-        {% endfor %}
-    ];
-
-    select.addEventListener('change', function() {
-        const selectedId = this.value;
-        const subcategoria = subcategorias.find(s => s.id === selectedId);
-        
-        if (subcategoria) {
-            fieldsContainer.style.display = 'block';
-            subcategoriaIdField.value = subcategoria.id;
-            subcategoriaNombreField.value = subcategoria.nombre;
-            subcategoriaPrecioField.value = subcategoria.precio;
-            subcategoriaDuracionField.value = subcategoria.duracion;
-        }
-    });
-
     const addSubcategoryBtn = document.getElementById('add-subcategory-btn');
-    const newSubcategoryFields = document.getElementById('new-subcategory-fields');
+    const container = document.getElementById('new-subcategories-container');
 
     addSubcategoryBtn.addEventListener('click', function() {
-        newSubcategoryFields.style.display = newSubcategoryFields.style.display === 'none' ? 'block' : 'none';
+        const subcategoryIndex = container.children.length;
+        const div = document.createElement('div');
+        div.classList.add('border', 'rounded', 'p-3', 'mb-3');
+        div.innerHTML = `
+            <h5>Nueva Subcategoría ${subcategoryIndex + 1}</h5>
+            <div class="form-group mb-2">
+                <label>Nombre:</label>
+                <input type="text" name="nueva_subcategoria_nombre[]" class="form-control" required>
+            </div>
+            <div class="form-group mb-2">
+                <label>Precio Base:</label>
+                <input type="number" name="nueva_subcategoria_precio[]" step="0.01" class="form-control" required>
+            </div>
+            <div class="form-group mb-2">
+                <label>Duración Estimada (horas):</label>
+                <input type="number" name="nueva_subcategoria_duracion[]" step="1" class="form-control" required>
+            </div>
+        `;
+        container.appendChild(div);
     });
 </script>
+
 
 {% endblock %}
 

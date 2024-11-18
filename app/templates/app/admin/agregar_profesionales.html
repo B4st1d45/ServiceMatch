@@ -9,6 +9,15 @@
                 <h2 class="text-center mb-4">Agregar Profesional</h2>
                 <form method="post">
                     {% csrf_token %}
+
+                    {% if messages %}
+                        <ul class="messages">
+                            {% for message in messages %}
+                            <li class="{{ message.tags }}">{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    
                     <div class="form-group mb-3">
                         <label for="rut" class="form-label">RUT:</label>
                         <input type="text" id="rut" name="rut" class="form-control" required>
@@ -41,7 +50,7 @@
                         <label for="contrasena" class="form-label">Contraseña:</label>
                         <input type="password" id="contrasena" name="contrasena" class="form-control" required>
                     </div>
-                    <input type="hidden" name="rol" value="3">
+                    
                     <div class="form-actions text-center">
                         <button type="submit" class="btn btn-primary">Guardar</button>
                         <a href="{% url 'gestionar_profesionales' %}" class="btn btn-secondary ms-2">Volver</a>

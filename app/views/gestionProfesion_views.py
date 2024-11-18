@@ -31,25 +31,35 @@ def agregar_profesion(request):
         nuevo_servicio.save()
 
         # Crear subcategorías
-        subcategorias_nombres = request.POST.getlist('subcategoria_nombre')
-        subcategorias_precios = request.POST.getlist('subcategoria_precio')
-        subcategorias_duraciones = request.POST.getlist('subcategoria_duracion')
+        subcategorias_nombres = request.POST.getlist('subcategoria_nombre[]')
+        subcategorias_precios = request.POST.getlist('subcategoria_precio[]')
+        subcategorias_duraciones = request.POST.getlist('subcategoria_duracion[]')
         for nombre, precio, duracion in zip(subcategorias_nombres, subcategorias_precios, subcategorias_duraciones):
             if nombre and precio and duracion:
-                nueva_subcategoria = Subcategoria(
+                Subcategoria.objects.create(
                     servicio=nuevo_servicio,
                     nombre=nombre,
                     precio_base=precio,
                     duracion_estimada=duracion
                 )
-                nueva_subcategoria.save()
             else:
-                messages.error(request, f"Error: Datos incompletos para subcategoría {nombre}. No se añadió.")
+                messages.error(request, f"Datos incompletos para subcategoría {nombre}.")
 
         messages.success(request, 'Servicio y subcategorías añadidos exitosamente.')
         return redirect('gestionar_profesion')
 
     return render(request, 'app/admin/agregar_profesion.html')
+
+def validar_subcategoria(nombre, precio, duracion):
+    """Valida los datos de una subcategoría."""
+    if not (nombre and precio and duracion):
+        return False, "Faltan datos obligatorios."
+    try:
+        precio = float(precio)
+        duracion = int(duracion)
+        return True, "Validación exitosa"
+    except ValueError:
+        return False, "Precio o duración inválidos."
 
 @user_passes_test(es_admin)
 def actualizar_profesion(request, servicio_id):
@@ -64,27 +74,25 @@ def actualizar_profesion(request, servicio_id):
             return redirect('actualizar_profesion', servicio_id=servicio_id)
         servicio.save()
 
-        # Actualizar las subcategorías existentes
+         # Validar y actualizar subcategorías existentes
         for subcategoria in servicio.subcategorias.all():
             subcategoria_nombre = request.POST.get(f'nombre_{subcategoria.id}')
             subcategoria_precio = request.POST.get(f'precio_{subcategoria.id}')
             subcategoria_duracion = request.POST.get(f'duracion_{subcategoria.id}')
 
-            if subcategoria_nombre and subcategoria_precio and subcategoria_duracion:
+            valido, mensaje = validar_subcategoria(subcategoria_nombre, subcategoria_precio, subcategoria_duracion)
+            if valido:
                 subcategoria.nombre = subcategoria_nombre
-                subcategoria.precio_base = subcategoria_precio
-                subcategoria.duracion_estimada = subcategoria_duracion
+                subcategoria.precio_base = float(subcategoria_precio)
+                subcategoria.duracion_estimada = int(subcategoria_duracion)
                 subcategoria.save()
             else:
-                messages.error(request, f"Error al actualizar la subcategoría {subcategoria.nombre}.")
+                messages.error(request, f"Error en subcategoría '{subcategoria.nombre}': {mensaje}")
 
-        # para manejar eliminación de subcategorías
+        # Eliminar subcategorías seleccionadas
         subcategorias_a_eliminar = request.POST.getlist('eliminar_subcategoria')
         if subcategorias_a_eliminar:
-            for subcat_id in subcategorias_a_eliminar:
-                subcategoria = Subcategoria.objects.filter(id=subcat_id).first()
-                if subcategoria:
-                    subcategoria.delete()
+            servicio.subcategorias.filter(id__in=subcategorias_a_eliminar).delete()
 
         # Agregar nuevas subcategorías al servicio
         nuevas_nombres = request.POST.getlist('nueva_subcategoria_nombre')
@@ -92,23 +100,25 @@ def actualizar_profesion(request, servicio_id):
         nuevas_duraciones = request.POST.getlist('nueva_subcategoria_duracion')
 
         for nombre, precio, duracion in zip(nuevas_nombres, nuevas_precios, nuevas_duraciones):
-            if nombre and precio and duracion:
-                if Subcategoria.objects.filter(nombre=nombre, servicio=servicio).exists():
-                    messages.error(request, f"Ya existe una subcategoría con el nombre '{nombre}' en este servicio.")
-                    continue
-                
-                nueva_subcategoria = Subcategoria(
-                    servicio=servicio,
-                    nombre=nombre,
-                    precio_base=precio,
-                    duracion_estimada=duracion
-                )
-                nueva_subcategoria.save()
+            valido, mensaje = validar_subcategoria(nombre, precio, duracion)
+            if valido:
+                if servicio.subcategorias.filter(nombre=nombre).exists():
+                    messages.error(request, f"La subcategoría '{nombre}' ya existe en este servicio.")
+                else:
+                    nueva_subcategoria = Subcategoria(
+                        servicio=servicio,
+                        nombre=nombre,
+                        precio_base=float(precio),
+                        duracion_estimada=int(duracion)
+                    )
+                    nueva_subcategoria.save()
+            else:
+                messages.error(request, f"Error al agregar nueva subcategoría: {mensaje}")
+
         
         messages.success(request, 'Servicio actualizado con éxito.')
         return redirect('gestionar_profesion')
 
-    subcategorias_existentes = servicio.subcategorias.all()
     return render(request, 'app/admin/actualizar_profesion.html', {
         'servicio': servicio, 
         'subcategorias_existentes': subcategorias_existentes,
