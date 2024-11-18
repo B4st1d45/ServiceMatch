@@ -12,7 +12,7 @@ def es_admin(user):
 
 @user_passes_test(es_admin)
 def gestionar_profesionales(request):
-    profesionales = Usuario.objects.all()
+    profesionales = Usuario.objects.filter(rol='profesional')
     return render(request, 'app/admin/gestionar_profesionales.html', {
         'profesionales': profesionales, 
     })
