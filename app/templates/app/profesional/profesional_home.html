@@ -65,19 +65,14 @@
 </div>
 
 <script>
-    const rating = 4.5;
-    //const rating = {{ calificacion_promedio|floatformat:1 }};
+    const rating = {{ calificacion_promedio|floatformat:1 }};
     const starContainer = document.getElementById("rating-stars");
 
-    //starContainer.innerHTML = '';
-
-    // Generar estrellas
     for (let i = 1; i <= 5; i++) {
         const star = document.createElement("span");
         star.classList.add("star");
         star.innerHTML = "&#9733;";
 
-        // Rellenar según el valor de `rating`
         if (i <= Math.floor(rating)) {
             star.classList.add("filled");
         } else if (i - rating < 1) {

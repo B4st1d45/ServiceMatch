@@ -37,16 +37,20 @@
         <!-- Lista de Profesionales para Calificar -->
         <div class="list-group mt-5">
             <h4>Profesionales para Calificar</h4>
-            {% for profesional in profesionales %}
-                <a href="{% url 'ver_reservas_profesional' profesional.id %}" class="list-group-item list-group-item-action">
-                    <div>
-                        <strong>{{ profesional.nombre }} {{ profesional.apellido }}</strong><br>
-                        Fecha: {{ profesional.reserva.fecha|date:"d/m/Y" }}<br>
-                        Servicio: {{ profesional.reserva.subcategoria.nombre }}<br>
-                        Precio: ${{ profesional.reserva.subcategoria.precio_base }}
-                    </div>
-                </a>
-            {% endfor %}
+            {% if profesionales %}
+                {% for profesional in profesionales %}
+                    <a href="{% url 'ver_reservas_profesional' profesional.id %}" class="list-group-item list-group-item-action">
+                        <div>
+                            <strong>{{ profesional.nombre }} {{ profesional.apellido }}</strong><br>
+                            Fecha: {{ profesional.reserva.fecha|date:"d/m/Y" }}<br>
+                            Servicio: {{ profesional.reserva.subcategoria.nombre }}<br>
+                            Precio: ${{ profesional.reserva.subcategoria.precio_base }}
+                        </div>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <p>No tienes profesionales disponibles para calificar.</p>
+            {% endif %}
         </div>
     </div>
 </div>

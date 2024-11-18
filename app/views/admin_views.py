@@ -14,14 +14,20 @@ def es_admin(user):
 def admin_home(request):
     # Obtener datos para las tarjetas
     total_reservas = Reserva.objects.count()
-    reservas_completadas = Reserva.objects.filter(estado='completada').count()
+    reservas_completadas = Reserva.objects.filter(estado='completada', subcategoria__isnull=False)
     total_usuarios = Usuario.objects.count()
 
     ganancias = Reserva.objects.filter(
         estado='completada', subcategoria__isnull=False
     ).aggregate(total_ganancias=Sum('subcategoria__precio_base'))['total_ganancias'] or 0
 
-    promedio_mensual = round(ganancias / 12, 2) if ganancias > 0 else 0
+    if reservas_completadas.exists():
+    # Obtener meses con ganancias
+        meses_con_ganancias = reservas_completadas.dates('fecha', 'month').count()
+        ganancias = reservas_completadas.aggregate(total_ganancias=Sum('subcategoria__precio_base'))
+        promedio_mensual = round(ganancias / meses_con_ganancias, 2) if meses_con_ganancias > 0 else 0
+    else:
+        ganancias = promedio_mensual = 0
 
     context = {
         'total_reservas': total_reservas,
