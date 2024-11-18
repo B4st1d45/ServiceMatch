@@ -22,8 +22,7 @@
         <select id="servicio" name="servicio" required onchange="filtrarSubcategorias(), filtrarProfesionales()">
             <option value="" disabled selected>Elige un servicio</option>
             {% for servicio in servicios %}
-                <option value="{{ servicio.id }}">
-                    {{ servicio.nombre }}</option>
+                <option value="{{ servicio.id }}">{{ servicio.nombre }}</option>
             {% endfor %}
         </select>
 
@@ -48,7 +47,7 @@
 
         <!-- Precio del Servicio Seleccionado -->
         <div>
-            <p><strong>Precio del Servicio:</strong> <span id="precio_servicio"> 0</span></p>
+            <p><strong>Precio del Servicio:</strong> <span id="precio_servicio">0</span></p>
         </div>
 
         <!-- Botones -->
@@ -71,14 +70,30 @@
         {% endfor %}
     };
 
+    // Profesionales por Servicio
+    const profesionalesPorServicio = {
+        {% for servicio in servicios %}
+        "{{ servicio.id }}": [
+            {% for profesional in profesionales %}
+            {% if profesional.profesion_id == servicio.id %}
+            {
+                "id": "{{ profesional.id }}",
+                "nombre": "{{ profesional.nombre }}",
+                "apellido": "{{ profesional.apellido }}"
+            },
+            {% endif %}
+            {% endfor %}
+        ],
+        {% endfor %}
+    };
+
     // Filtrar subcategorías al seleccionar servicio
     function filtrarSubcategorias() {
         const servicioSelect = document.getElementById('servicio');
         const subcategoriaSelect = document.getElementById('subcategoria');
         const selectedServiceId = servicioSelect.value;
-        
+
         subcategoriaSelect.innerHTML = '<option value="" disabled selected>Elige un tipo de servicio</option>';
-        
         const subcategorias = subcategoriasPorServicio[selectedServiceId] || [];
         subcategorias.forEach(subcategoria => {
             const option = document.createElement('option');
@@ -94,41 +109,23 @@
         const subcategoriaSelect = document.getElementById('subcategoria');
         const selectedOption = subcategoriaSelect.options[subcategoriaSelect.selectedIndex];
         let precio = parseFloat(selectedOption.dataset.precio || "0");
-        document.getElementById('precio_servicio').textContent = precio.toLocaleString('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 });    }
+        document.getElementById('precio_servicio').textContent = precio.toLocaleString('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 });
+    }
 
-    const profesionalesPorServicio = {
-        {% for servicio in servicios %}
-        {{ servicio.id }}: [
-            {% for profesional in profesionales %}
-            {% if profesional.profesion_id == servicio.id %}
-            {
-                "id": {{ profesional.id }},
-                "nombre": "{{ profesional.nombre }}",
-                "apellido": "{{ profesional.apellido }}",
-                "profesion": "{{ profesional.profesion.nombre }}"
-            }{% if not forloop.last %},{% endif %}
-            {% endif %}
-            {% endfor %}
-        ],
-        {% endfor %}
-    };
-
+    // Filtrar profesionales al seleccionar servicio
     function filtrarProfesionales() {
         const servicioSelect = document.getElementById('servicio');
         const profesionalSelect = document.getElementById('profesional');
         const selectedServiceId = servicioSelect.value;
 
         profesionalSelect.innerHTML = '<option value="" disabled selected>Elige un profesional</option>';
-
-        if (selectedServiceId) {
-            const profesionales = profesionalesPorServicio[selectedServiceId] || [];
-            profesionales.forEach(profesional => {
-                const option = document.createElement('option');
-                option.value = profesional.id;
-                option.textContent = `${profesional.nombre} ${profesional.apellido}`;
-                profesionalSelect.appendChild(option);
-            });
-        }
+        const profesionales = profesionalesPorServicio[selectedServiceId] || [];
+        profesionales.forEach(profesional => {
+            const option = document.createElement('option');
+            option.value = profesional.id;
+            option.textContent = `${profesional.nombre} ${profesional.apellido}`;
+            profesionalSelect.appendChild(option);
+        });
     }
 </script>
 {% endblock %}
