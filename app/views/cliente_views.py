@@ -35,11 +35,6 @@ def actualizar_cliente(request):
         nueva_contrasena = request.POST.get('nueva_contrasena')
         confirmar_contrasena = request.POST.get('confirmar_contrasena')
 
-        # Verificar si las contraseñas coinciden
-        if nueva_contrasena != confirmar_contrasena:
-            messages.error(request, 'Las contraseñas no coinciden.')
-            return redirect('actualizar_cliente')
-        
         # Verificar si el email ya existe para otro usuario
         if Usuario.objects.filter(email=email).exclude(id=cliente.id).exists():
             messages.error(request, 'El correo electrónico ya está registrado.')
@@ -47,12 +42,20 @@ def actualizar_cliente(request):
 
         cliente.email = email
 
-        # Actualizar la contraseña si se proporcionó
-        if nueva_contrasena:
+        # Verificar si las contraseñas coinciden
+        if nueva_contrasena or confirmar_contrasena:
+            if nueva_contrasena != confirmar_contrasena:
+                messages.error(request, 'Las contraseñas no coinciden.')
+                return redirect('actualizar_cliente')
             cliente.set_password(nueva_contrasena)
 
-        cliente.save()
-        messages.success(request, 'Información actualizada con éxito.')
+        # Guardar los cambios
+        try:
+            cliente.save()
+            messages.success(request, 'Información actualizada con éxito.')
+        except Exception as e:
+            messages.error(request, f'Ocurrió un error: {str(e)}')
+            
         return redirect('cliente_home')
 
     return render(request, 'app/cliente/actualizar_cliente.html', {'cliente': cliente})

@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
 from app.models import Reserva, Usuario
 from django.http import JsonResponse
-from django.db.models import Count
+from django.db.models import Count, Sum
 
 def es_admin(user):
     if user.is_superuser:
@@ -13,25 +13,21 @@ def es_admin(user):
 def obtener_estadisticas_reservas(request):
     reservas_por_mes = Reserva.objects.values('fecha__month', 'estado').annotate(cantidad=Count('id')).order_by('fecha__month')
     data = {
-        'completadas': [],
-        'pendientes': [],
-        'canceladas': [],
-        'meses': []
+        'completadas': [0] * 12,
+        'pendientes': [0] * 12,
+        'canceladas': [0] * 12,
+        'meses': ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
     }
-    
-    meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
-    
-    for reserva in reservas_por_mes:
-        mes_nombre = meses[reserva['fecha__month'] - 1]
-        if mes_nombre not in data['meses']:
-            data['meses'].append(mes_nombre)
 
+    for reserva in reservas_por_mes:
+        mes_index = reserva['fecha__month'] - 1
         if reserva['estado'] == 'completada':
-            data['completadas'].append(reserva['cantidad'])
+            data['completadas'][mes_index] += reserva['cantidad']
         elif reserva['estado'] == 'pendiente':
-            data['pendientes'].append(reserva['cantidad'])
+            data['pendientes'][mes_index] += reserva['cantidad']
         elif reserva['estado'] == 'cancelada':
-            data['canceladas'].append(reserva['cantidad'])
+            data['canceladas'][mes_index] += reserva['cantidad']
             
     return JsonResponse(data)
 
@@ -41,9 +37,9 @@ def obtener_estadisticas_tarjetas(request):
     reservas_completadas = Reserva.objects.filter(estado='completada').count()
     total_usuarios = Usuario.objects.count()  
 
-    # Ejemplo de cálculo de promedio mensual y ganancias (ajusta según tus datos)
-    ganancias = Reserva.objects.filter(estado='completada').aggregate(total_ganancias=sum('precio'))['total_ganancias'] or 0
-    promedio_mensual = ganancias / 12  
+    # Cálculo de ganancias
+    ganancias = Reserva.objects.filter(estado='completada').aggregate(total_ganancias=Sum('subcategoria__precio_base'))['total_ganancias'] or 0
+    promedio_mensual = ganancias / 12 if ganancias > 0 else 0 
 
     data = {
         'total_reservas': total_reservas,

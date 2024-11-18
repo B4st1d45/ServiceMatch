@@ -6,8 +6,8 @@ from datetime import timedelta
 from django.contrib.auth.hashers import make_password, check_password
 from django.conf import settings
 
-class Rol(models.Model):
-    nombre = models.CharField(max_length=50, unique=True)
+class Servicio(models.Model):
+    nombre = models.CharField(max_length=100)
 
     def __str__(self):
         return self.nombre
@@ -20,7 +20,30 @@ class Usuario(AbstractUser):
     telefono = models.CharField(max_length=20)
     direccion = models.CharField(max_length=255)
     rut = models.CharField(max_length=12, unique=True, default='00000000-0')
-    rol = models.ForeignKey(Rol, on_delete=models.CASCADE)
+
+    ROL_CHOICES = [
+        ('cliente', 'Cliente'),
+        ('profesional', 'Profesional'),
+    ]
+    rol = models.CharField(max_length=20, choices=ROL_CHOICES, default='cliente')
+
+    profesion = models.ForeignKey(
+        Servicio, 
+        on_delete=models.CASCADE, 
+        blank=True, 
+        null=True,  # Solo para profesionales
+        related_name="profesionales"
+    )
+    estado = models.CharField(
+        max_length=10, 
+        choices=[('activo', 'Activo'), ('inactivo', 'Inactivo')], 
+        default='activo', 
+        blank=True, 
+        null=True  # Solo para profesionales
+    )
+
+    def __str__(self):
+        return f"{self.nombre} {self.apellido} ({self.rol})"
 
     groups = models.ManyToManyField(
         'auth.Group',
@@ -36,42 +59,6 @@ class Usuario(AbstractUser):
     def __str__(self):
         return f"{self.nombre} {self.apellido} ({self.rol})"
 
-
-
-class Servicio(models.Model):
-    nombre = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.nombre
-
-
-class Profesional(AbstractUser):
-    nombre = models.CharField(max_length=100)
-    apellido = models.CharField(max_length=100)
-    profesion = models.ForeignKey(Servicio, on_delete=models.CASCADE)
-    telefono = models.CharField(max_length=20)
-    rut = models.CharField(max_length=12, unique=True, default='00000000-0')
-    estado = models.CharField(max_length=10, choices=[('activo', 'Activo'), ('inactivo', 'Inactivo')], default='activo')
-    last_login = models.DateTimeField(default=timezone.now)
-    
-    # Definir un valor por defecto para password
-    password = models.CharField(max_length=128, default='default_password')
-
-    groups = models.ManyToManyField(
-        'auth.Group',
-        related_name='profesional_set',
-        blank=True
-    )
-    user_permissions = models.ManyToManyField(
-        'auth.Permission',
-        related_name='profesional_set',
-        blank=True
-    )
-
-    def __str__(self):
-        return f"{self.nombre} {self.apellido} ({self.profesion.nombre})"
-
-
 class Subcategoria(models.Model):
     servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, related_name="subcategorias")
     nombre = models.CharField(max_length=100)
@@ -82,8 +69,8 @@ class Subcategoria(models.Model):
         return f"{self.nombre} - {self.servicio.nombre}"
 
 class Reserva(models.Model):
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    profesional = models.ForeignKey(Profesional, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="reservas_cliente")
+    profesional = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="reservas_profesional")
     subcategoria = models.ForeignKey(Subcategoria, on_delete=models.CASCADE)
     fecha = models.DateTimeField()
     estado = models.CharField(max_length=20, choices=[
@@ -119,10 +106,16 @@ class Reserva(models.Model):
         super().save(*args, **kwargs)
 
 class Reseña(models.Model):
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    profesional = models.ForeignKey(Profesional, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="resenas_cliente")
+    profesional = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="resenas_profesional")
     comentario = models.TextField()
-    calificacion = models.IntegerField(choices=[(1, '1 estrella'), (2, '2 estrellas'), (3, '3 estrellas'), (4, '4 estrellas'), (5, '5 estrellas')])
+    calificacion = models.IntegerField(choices=[
+        (1, '1 estrella'),
+        (2, '2 estrellas'),
+        (3, '3 estrellas'),
+        (4, '4 estrellas'),
+        (5, '5 estrellas')
+    ])
     fecha = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

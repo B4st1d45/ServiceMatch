@@ -1,25 +1,27 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from app import models
-from app.models import Profesional, Reserva, Reseña
+from app.models import Reserva, Usuario, Reseña
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from datetime import datetime, timedelta
 from django.utils import formats
 from django.http import JsonResponse
 
-
 def profesional_home(request):
+    if request.user.rol != 'profesional':
+        return redirect('home')
+
     today = datetime.today()
     start_of_week = today - timedelta(days=today.weekday())
     end_of_week = start_of_week + timedelta(days=6)
 
     reservas_semana = Reserva.objects.filter(
-        # profesional=request.user, 
+        usuario=request.user,
         fecha__range=[start_of_week, end_of_week]
     ).order_by('fecha')
 
     reservas_mes = Reserva.objects.filter(
-        #profesional=request.user,
+        usuario=request.user,
         fecha__month=today.month
     ).count()
 
@@ -44,16 +46,23 @@ def profesional_home(request):
 
 
 def dashboard_profesional(request):
-    profesional_id = request.session.get('profesional_id')
-    if not profesional_id:
-        return redirect('login_profesional')
+    if request.user.rol != 'profesional':
+        return redirect('home') 
+    
+    profesional = request.user 
+    nombre_profesional = profesional.nombre
 
-    profesional = Profesional.objects.get(id=profesional_id)
-    return render(request, 'app/dashboard_profesional.html', {'profesional': profesional})
+    context = {
+        'profesional': profesional,
+        'nombre_profesional': nombre_profesional,
+    }
 
-
+    return render(request, 'app/dashboard_profesional.html', context)
 
 def editar_perfil_profesional(request):
+    if request.user.rol != 'profesional':
+        return redirect('home')
+    
     profesional = request.user
 
     if request.method == 'POST':
@@ -70,7 +79,7 @@ def editar_perfil_profesional(request):
             return redirect('editar_perfil_profesional')
         
         # Verificar si el email ya existe para otro usuario
-        if Profesional.objects.filter(email=email).exclude(id=profesional.id).exists():
+        if Usuario.objects.filter(email=email).exclude(id=profesional.id).exists():
             messages.error(request, 'El correo electrónico ya está registrado.')
             return redirect('editar_perfil_profesional')
 
@@ -86,24 +95,25 @@ def editar_perfil_profesional(request):
 
     return render(request, 'app/profesional/editar_perfil.html', {'profesional': profesional})
 
-
 def reservas_json(request):
-    profesional = request.user
-    reservas = Reserva.objects.filter(profesional=profesional)
+    if request.user.rol != 'profesional':
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+    
+    reservas = Reserva.objects.filter(usuario=request.user)
     events = []
 
     for reserva in reservas:
         events.append({
             'title': f"{reserva.subcategoria.nombre} - {reserva.usuario.nombre}",
             'start': reserva.fecha.isoformat(),
-            'end': (reserva.fecha + timedelta(hours=1)).isoformat()  # Suponiendo que la reserva dura 1 hora
+            'end': (reserva.fecha + timedelta(hours=1)).isoformat()  
         })
 
     return JsonResponse(events, safe=False)
 
 @login_required
 def calendario_reservas(request):
-    if request.user.is_authenticated:
+    if request.user.rol == 'profesional':
         profesional = request.user
         reservas = Reserva.objects.filter(profesional=profesional)
         return render(request, 'app/profesional/calendario_reservas.html', {'reservas': reservas})

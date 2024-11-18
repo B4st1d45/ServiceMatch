@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from app.models import Rol, Usuario
+from app.models import Usuario
 from django.contrib import messages
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
@@ -13,7 +13,6 @@ def user_login(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        # Intentar autenticar al usuario
         usuario = authenticate(request, username=email, password=password)
 
         if usuario is not None:
@@ -21,9 +20,11 @@ def user_login(request):
             messages.success(request, f'Bienvenido {usuario.nombre}')
             
             # Redirigir según el rol del usuario
-            if usuario.rol.nombre == 'admin':
+            if usuario.is_superuser:
                 return redirect('admin_home')
-            elif usuario.rol.nombre == 'cliente':
+            elif usuario.rol == 'profesional':
+                return redirect('profesional_home')
+            elif usuario.rol == 'cliente':
                 return redirect('inicio')
             else:
                 messages.error(request, 'Rol de usuario no válido.')
@@ -43,13 +44,13 @@ def user_logout(request):
 
 def user_register(request):
     if request.method == 'POST':
-        # Obtener los datos del formulario
+        # datos del formulario
         nombre = request.POST.get('first_name')
         apellido = request.POST.get('last_name')
         email = request.POST.get('email')
         telefono = request.POST.get('phone')
         direccion = request.POST.get('address')
-        rut = request.POST.get('rut')  # Nuevo campo RUT
+        rut = request.POST.get('rut')
         password = request.POST.get('password')
         confirmar_password = request.POST.get('password_confirmation')
 
@@ -68,13 +69,6 @@ def user_register(request):
             messages.error(request, 'El RUT ya está registrado.')
             return redirect('register')
 
-        # Obtener el rol 'cliente'
-        try:
-            rol_cliente = Rol.objects.get(nombre='cliente')
-        except Rol.DoesNotExist:
-            messages.error(request, 'El rol cliente no existe.')
-            return redirect('register')
-
         # Crear el usuario
         usuario = Usuario(
             username=email,
@@ -83,12 +77,12 @@ def user_register(request):
             email=email,
             telefono=telefono,
             direccion=direccion,
-            rut=rut,  
+            rut=rut, 
+            rol='cliente', 
         )
-        usuario.set_password(password)  # Esto maneja la encriptación
+        usuario.set_password(password)
 
         # Guardar el usuario en la base de datos
-        usuario.rol = rol_cliente
         usuario.save()
 
         list(messages.get_messages(request))

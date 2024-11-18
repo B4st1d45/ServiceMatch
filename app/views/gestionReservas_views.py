@@ -3,12 +3,16 @@ from django.http import JsonResponse
 from django.db.models import Count
 from django.contrib.auth.decorators import login_required
 
-
-
+# Mapear los estados desde el modelo para evitar valores "duros"
+ESTADOS_RESERVA = {
+    'completada': 'Completadas',
+    'pendiente': 'Pendientes',
+    'cancelada': 'Canceladas'
+}
 
 @login_required
 def obtener_estadisticas_reservas(request):
-    reservas_por_mes = Reserva.objects.values('fecha__month', 'estado').annotate(cantidad=Count('id')).order_by('fecha__month')
+    reservas_por_mes = (Reserva.objects.values('fecha__month', 'estado').annotate(cantidad=Count('id')).order_by('fecha__month'))
     data = {
         'completadas': [],
         'pendientes': [],
@@ -23,11 +27,12 @@ def obtener_estadisticas_reservas(request):
         if mes_nombre not in data['meses']:
             data['meses'].append(mes_nombre)
 
-        if reserva['estado'] == 'completada':
+        estado = reserva['estado']
+        if estado == 'completada':
             data['completadas'].append(reserva['cantidad'])
-        elif reserva['estado'] == 'pendiente':
+        elif estado == 'pendiente':
             data['pendientes'].append(reserva['cantidad'])
-        elif reserva['estado'] == 'cancelada':
+        elif estado == 'cancelada':
             data['canceladas'].append(reserva['cantidad'])
             
     return JsonResponse(data)

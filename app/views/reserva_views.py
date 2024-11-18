@@ -1,9 +1,9 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from django.http import JsonResponse
 from django.utils import timezone
 from django.shortcuts import render, redirect
-from app.models import Servicio, Profesional, Reserva, Subcategoria
-from django.shortcuts import get_object_or_404, redirect
+from app.models import Servicio, Usuario, Reserva, Subcategoria
+from django.shortcuts import get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
@@ -20,7 +20,8 @@ def crear_reserva(request):
         # Concatenar fecha y hora en un solo campo DateTime
         fecha_hora = datetime.strptime(f"{fecha} {hora}", '%Y-%m-%d %H:%M')
         fecha_hora = timezone.make_aware(fecha_hora)
-        profesional = get_object_or_404(Profesional, id=profesional_id)
+
+        profesional = get_object_or_404(Usuario, id=profesional_id, rol='profesional')
         subcategoria = get_object_or_404(Subcategoria, id=subcategoria_id)
 
         # Crear la reserva
@@ -42,7 +43,7 @@ def crear_reserva(request):
 
     else:
         servicios = Servicio.objects.all()
-        profesionales = Profesional.objects.filter(estado='activo')
+        profesionales = Usuario.objects.filter(rol='profesional', estado='activo')
         return render(request, 'app/reserva/crear_reserva.html', {
             'servicios': servicios,
             'profesionales': profesionales,
@@ -63,7 +64,6 @@ def reservas_json(request):
 
     return JsonResponse(eventos, safe=False)
 
-
 @login_required
 def ver_mis_reservas(request):
     reservas = Reserva.objects.filter(usuario=request.user)
@@ -79,8 +79,6 @@ def eliminar_reserva(request, reserva_id):
         messages.success(request, 'Reserva eliminada exitosamente.')
         return redirect('ver_mis_reservas')
     return render(request, 'app//cliente/eliminar_reserva.html', {'reserva': reserva})
-
-
 
 def reservas_totales(request):
     reservas = Reserva.objects.select_related('profesional', 'usuario').all()

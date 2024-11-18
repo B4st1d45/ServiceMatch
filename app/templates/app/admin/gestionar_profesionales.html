@@ -24,7 +24,7 @@
                     <th scope="col">Profesión</th>
                     <th scope="col">Email</th>
                     <th scope="col">Teléfono</th>
-                    <th scope="col">RUT</th> <!-- Agregado campo RUT -->
+                    <th scope="col">RUT</th>
                     <th scope="col">Acción</th>
                 </tr>
             </thead>
@@ -36,7 +36,7 @@
                         <td>{{ profesional.profesion.nombre }}</td> 
                         <td>{{ profesional.email }}</td>
                         <td>{{ profesional.telefono }}</td>
-                        <td>{{ profesional.rut }}</td> <!-- Agregado valor RUT -->
+                        <td>{{ profesional.rut }}</td>
                         <td>
                             <div class="d-flex justify-content-center">
                                 <a href="{% url 'eliminar_profesional' profesional.id %}" class="btn btn-warning btn-sm me-2">
@@ -50,7 +50,7 @@
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="7" class="text-muted">No hay profesionales registrados.</td> <!-- Ajustado colspan -->
+                        <td colspan="7" class="text-muted">No hay profesionales registrados.</td>
                     </tr>
                 {% endfor %}
             </tbody>

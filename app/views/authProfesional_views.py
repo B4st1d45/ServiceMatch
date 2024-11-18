@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from app.models import Profesional
+from app.models import Usuario
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login
 from django.views.decorators.csrf import csrf_protect
@@ -12,19 +12,19 @@ def login_profesional(request):
         password = request.POST.get('password')
 
         # Intentar autenticar al profesional
-        try:
-            profesional = Profesional.objects.get(email=email)
-        except Profesional.DoesNotExist:
-            messages.error(request, 'El correo electrónico no está registrado.')
-            return redirect('login_profesional')
+        usuario = authenticate(request, username=email, password=password)
 
-        # Verificar la contraseña
-        if profesional.check_password(password):
-            auth_login(request, profesional)
-            messages.success(request, f'Bienvenid@ {profesional.nombre}')
-            return redirect('profesional_home')
+        if usuario is not None:
+            # Verificar si el rol es 'profesional'
+            if usuario.rol == 'profesional':
+                auth_login(request, usuario)
+                messages.success(request, f'Bienvenid@ {usuario.nombre}')
+                return redirect('profesional_home')
+            else:
+                messages.error(request, 'El usuario no tiene rol de profesional.')
+                return redirect('login_profesional')
         else:
-            messages.error(request, 'Contraseña incorrecta.')
+            messages.error(request, 'Correo electrónico o contraseña incorrectos.')
             return redirect('login_profesional')
 
     return render(request, 'app/auth/login_profesional.html')

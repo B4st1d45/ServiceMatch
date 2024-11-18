@@ -28,8 +28,8 @@ INSTALLED_APPS = [
     'drf_yasg',
 ]
 
-AUTH_USER_MODEL = 'app.Usuario'  # Define Usuario como el modelo principal
-AUTH_USER_MODEL = 'app.Profesional'
+AUTH_USER_MODEL = 'app.Usuario'  
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
