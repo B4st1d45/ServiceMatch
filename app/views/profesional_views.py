@@ -5,6 +5,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from datetime import datetime, timedelta
 from django.utils import formats
+from django.http import JsonResponse
+
 
 def profesional_home(request):
     today = datetime.today()
@@ -40,19 +42,7 @@ def profesional_home(request):
     }
     return render(request, 'app/profesional/profesional_home.html', context)
 
-'''
-@login_required
-def profesional_home(request):
-    profesional_id = request.session.get('profesional_id')
-    if not profesional_id:
-        messages.error(request, 'No se encontró la sesión del profesional.')
-        return redirect('login')
-    
-    profesional = Profesional.objects.get(id=profesional_id)
-    return render(request, 'app/profesional/profesional_home.html', {'profesional': profesional})
-'''
 
-@login_required
 def dashboard_profesional(request):
     profesional_id = request.session.get('profesional_id')
     if not profesional_id:
@@ -62,24 +52,60 @@ def dashboard_profesional(request):
     return render(request, 'app/dashboard_profesional.html', {'profesional': profesional})
 
 
-# Editar perfil
-def editar_perfil(request):
-    '''profesional = get_object_or_404(Profesional, user=request.user)
 
-    if request.method == "POST":
-        # Obtén los datos del formulario
-        profesional.nombre = request.POST.get("nombre")
-        profesional.email = request.POST.get("email")
-        profesional.telefono = request.POST.get("telefono")
-        profesional.experiencia = request.POST.get("experiencia")
-        profesional.habilidades = request.POST.get("habilidades")
+def editar_perfil_profesional(request):
+    profesional = request.user
+
+    if request.method == 'POST':
+        profesional.nombre = request.POST.get('nombre')
+        profesional.apellido = request.POST.get('apellido')
+        profesional.telefono = request.POST.get('telefono')
+        email = request.POST.get('email')
+        nueva_contrasena = request.POST.get('nueva_contrasena')
+        confirmar_contrasena = request.POST.get('confirmar_contrasena')
+
+        # Verificar si las contraseñas coinciden
+        if nueva_contrasena != confirmar_contrasena:
+            messages.error(request, 'Las contraseñas no coinciden.')
+            return redirect('editar_perfil_profesional')
         
-        # Guarda los cambios
+        # Verificar si el email ya existe para otro usuario
+        if Profesional.objects.filter(email=email).exclude(id=profesional.id).exists():
+            messages.error(request, 'El correo electrónico ya está registrado.')
+            return redirect('editar_perfil_profesional')
+
+        profesional.email = email
+
+        # Actualizar la contraseña si se proporcionó
+        if nueva_contrasena:
+            profesional.set_password(nueva_contrasena)
+
         profesional.save()
-        return redirect('app/profesional/profesional_home.html')
+        messages.success(request, 'Información actualizada con éxito.')
+        return redirect('profesional_home')
 
-    return render(request, "app/profesional/editar_perfil.html", {"profesional": profesional})'''
-    return render(request, "app/profesional/editar_perfil.html")
+    return render(request, 'app/profesional/editar_perfil.html', {'profesional': profesional})
 
+
+def reservas_json(request):
+    profesional = request.user
+    reservas = Reserva.objects.filter(profesional=profesional)
+    events = []
+
+    for reserva in reservas:
+        events.append({
+            'title': f"{reserva.subcategoria.nombre} - {reserva.usuario.nombre}",
+            'start': reserva.fecha.isoformat(),
+            'end': (reserva.fecha + timedelta(hours=1)).isoformat()  # Suponiendo que la reserva dura 1 hora
+        })
+
+    return JsonResponse(events, safe=False)
+
+@login_required
 def calendario_reservas(request):
-    return render(request, "app/profesional/calendario_reservas.html")
+    if request.user.is_authenticated:
+        profesional = request.user
+        reservas = Reserva.objects.filter(profesional=profesional)
+        return render(request, 'app/profesional/calendario_reservas.html', {'reservas': reservas})
+    else:
+        return redirect('login')

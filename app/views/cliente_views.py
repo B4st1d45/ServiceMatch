@@ -30,6 +30,7 @@ def actualizar_cliente(request):
     if request.method == 'POST':
         cliente.nombre = request.POST.get('nombre')
         cliente.apellido = request.POST.get('apellido')
+        cliente.telefono = request.POST.get('telefono')
         email = request.POST.get('email')
         nueva_contrasena = request.POST.get('nueva_contrasena')
         confirmar_contrasena = request.POST.get('confirmar_contrasena')
