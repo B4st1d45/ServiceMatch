@@ -1,0 +1,43 @@
+{% extends 'app/header.html' %}
+
+{% block title %}Calificar Profesional{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Calificar {{ profesional.nombre }} {{ profesional.apellido }}</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    Deja tu Reseña para {{ profesional.nombre }} {{ profesional.apellido }}
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="profesional" value="{{ profesional.id }}">
+                        <div class="form-group mb-3">
+                            <label for="calificacion" class="form-label">Calificación:</label>
+                            <select id="calificacion" name="calificacion" class="form-select" required>
+                                <option value="" disabled selected>Selecciona una calificación</option>
+                                <option value="1">1 - Muy Malo</option>
+                                <option value="2">2 - Malo</option>
+                                <option value="3">3 - Regular</option>
+                                <option value="4">4 - Bueno</option>
+                                <option value="5">5 - Excelente</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="comentario" class="form-label">Comentario:</label>
+                            <textarea id="comentario" name="comentario" class="form-control" rows="4" required></textarea>
+                        </div>
+                        <div class="form-actions text-center">
+                            <button type="submit" class="btn btn-primary">Enviar Reseña</button>
+                            <a href="{% url 'cliente_home' %}" class="btn btn-secondary ms-2">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

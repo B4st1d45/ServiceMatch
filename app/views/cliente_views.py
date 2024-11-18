@@ -1,7 +1,10 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
-from app.models import Reserva, Usuario
+from app.models import Reserva, Usuario, Reseña, Profesional
 from django.contrib import messages
+from django.shortcuts import render, get_object_or_404
+
+
 
 @login_required
 def cliente_home(request):
@@ -11,13 +14,18 @@ def cliente_home(request):
     reservas_totales = reservas.count()
     reservas_completadas = reservas.filter(estado='completada').count()
     reservas_pendientes = reservas.filter(estado='pendiente').count()
+    profesionales = Profesional.objects.filter(reserva__usuario=cliente).distinct()
+
+    for profesional in profesionales:
+        profesional.reserva = reservas.filter(profesional=profesional).first()
 
     context = {
         'cliente': cliente,
         'reservas': reservas,
         'reservas_totales': reservas_totales,
         'reservas_completadas': reservas_completadas,
-        'reservas_pendientes': reservas_pendientes
+        'reservas_pendientes': reservas_pendientes,
+        'profesionales': profesionales
     }
 
     return render(request, 'app/cliente/cliente_home.html', context)
@@ -56,3 +64,30 @@ def actualizar_cliente(request):
         return redirect('cliente_home')
 
     return render(request, 'app/cliente/actualizar_cliente.html', {'cliente': cliente})
+
+@login_required
+def ver_reservas_profesional(request, profesional_id):
+    profesional = get_object_or_404(Profesional, id=profesional_id)
+    reservas = Reserva.objects.filter(profesional=profesional)
+    return render(request, 'app/cliente/ver_reservas_profesional.html', {'profesional': profesional, 'reservas': reservas})
+
+
+@login_required
+def calificar_profesional(request, profesional_id):
+    profesional = get_object_or_404(Profesional, id=profesional_id)
+
+    if request.method == 'POST':
+        calificacion = request.POST.get('calificacion')
+        comentario = request.POST.get('comentario')
+
+        cliente = request.user
+
+        # Crear y guardar la nueva reseña
+        nueva_resenia = Reseña(usuario=cliente, profesional=profesional, calificacion=calificacion, comentario=comentario)
+        nueva_resenia.save()
+
+        messages.success(request, '¡Gracias por tu reseña!')
+        return redirect('cliente_home')
+
+    return render(request, 'app/cliente/calificar.html', {'profesional': profesional})
+
