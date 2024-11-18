@@ -6,6 +6,12 @@ __pycache__
 db.sqlite3
 media
 
+# Ignorar base de datos SQLite
+db.sqlite3
+
+# Ignorar archivos .pyc generados
+*.pyc
+
 # Backup files # 
 *.bak 
 
