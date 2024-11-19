@@ -14,18 +14,21 @@ def es_admin(user):
 def admin_home(request):
     # Obtener datos para las tarjetas
     total_reservas = Reserva.objects.count()
-    reservas_completadas = Reserva.objects.filter(estado='completada', subcategoria__isnull=False)
+    reservas_completadas_queryset = Reserva.objects.filter(estado='completada', subcategoria__isnull=False)  # Este es el queryset
+    reservas_completadas = reservas_completadas_queryset.count()  # Solo la cantidad de reservas
     total_usuarios = Usuario.objects.count()
 
-    ganancias = Reserva.objects.filter(
-        estado='completada', subcategoria__isnull=False
-    ).aggregate(total_ganancias=Sum('subcategoria__precio_base'))['total_ganancias'] or 0
-
-    if reservas_completadas.exists():
-    # Obtener meses con ganancias
-        meses_con_ganancias = reservas_completadas.dates('fecha', 'month').count()
-        ganancias = reservas_completadas.aggregate(total_ganancias=Sum('subcategoria__precio_base'))
-        promedio_mensual = round(ganancias / meses_con_ganancias, 2) if meses_con_ganancias > 0 else 0
+    ganancias = reservas_completadas_queryset.aggregate(total_ganancias=Sum('subcategoria__precio_base'))['total_ganancias'] or 0
+    
+    if reservas_completadas > 0:
+        # Obtener meses con ganancias
+        meses_con_ganancias = reservas_completadas_queryset.dates('fecha', 'month').count()  # Usamos el queryset aquí
+        ganancias_totales = ganancias
+        promedio_mensual = ganancias_totales / meses_con_ganancias if meses_con_ganancias > 0 else 0
+        if promedio_mensual == int(promedio_mensual):
+            promedio_mensual = int(promedio_mensual)
+        else:
+            promedio_mensual = round(promedio_mensual, 2)
     else:
         ganancias = promedio_mensual = 0
 

@@ -17,8 +17,12 @@ def cliente_home(request):
 
     if cliente.rol != 'cliente':
         return HttpResponseForbidden("No tienes permisos para acceder a esta página.")
-
-    profesionales = Usuario.objects.filter(reservas_cliente__usuario=cliente, rol='profesional').distinct().prefetch_related('reservas_cliente')
+    
+    profesionales = Usuario.objects.filter(
+        reservas_cliente__usuario=cliente, 
+        rol='profesional',
+        reservas_cliente__estado='completada'
+    ).distinct().prefetch_related('reservas_cliente')
 
     for profesional in profesionales:
         profesional.reserva = reservas.filter(profesional=profesional).first()
