@@ -140,3 +140,10 @@ def editar_disponibilidad(request):
         return redirect('profesional_home')
 
     return render(request, 'app/profesional/editar_disponibilidad.html', {'profesional': profesional})
+
+@login_required
+def reservas_totales_profesional(request):
+    reservas = Reserva.objects.filter(profesional=request.user).select_related('usuario', 'subcategoria').order_by('-fecha')
+    return render(request, 'app/profesional/reservas_totales_profesional.html', {
+        'reservas': reservas,
+    })

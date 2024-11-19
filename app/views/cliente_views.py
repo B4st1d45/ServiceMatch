@@ -118,3 +118,10 @@ def calificar_profesional(request, profesional_id):
 
     return render(request, 'app/cliente/calificar.html', {'profesional': profesional})
 
+
+@login_required
+def reservas_totales_cliente(request):
+    reservas = Reserva.objects.filter(usuario=request.user).select_related('profesional', 'subcategoria').order_by('-fecha')
+    return render(request, 'app/reservas_totales_cliente.html', {
+        'reservas': reservas,
+    })
