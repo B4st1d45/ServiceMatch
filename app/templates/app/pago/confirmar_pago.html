@@ -1,0 +1,17 @@
+{% extends 'app/header.html' %}
+{% load context_processors %}
+
+{% block content %}
+<div class="container-pago">
+    <h1>Confirmar Pago</h1>
+    <p>Estás a punto de pagar por el servicio: <strong>{{ reserva.subcategoria.nombre }}</strong></p>
+    <p>Precio: <strong>${{ reserva.subcategoria.precio_base|formato_precio }}</strong></p>
+    <p>Profesional: <strong>{{ reserva.profesional.nombre }} {{ reserva.profesional.apellido }}</strong></p>
+
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-pago">Pagar</button>
+        <a href="{% url 'ver_mis_reservas' %}" class="btn btn-cancelar">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

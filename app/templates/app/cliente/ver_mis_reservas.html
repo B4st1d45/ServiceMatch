@@ -1,4 +1,6 @@
 {% extends 'app/header.html' %}
+{% load context_processors %}
+
 
 {% block title %}Mis Reservas{% endblock %}
 
@@ -21,7 +23,7 @@
                     <td>{{ reserva.subcategoria.nombre }}</td>
                     <td>{{ reserva.profesional.nombre }} {{ reserva.profesional.apellido }}</td>
                     <td>{{ reserva.fecha|date:"d M Y H:i" }}</td>
-                    <td>${{ reserva.subcategoria.precio_base }}</td>
+                    <td>${{ reserva.subcategoria.precio_base|formato_precio }}</td>
                     <td>
                         <a href="{% url 'eliminar_reserva' reserva.id %}" class="btn btn-danger">Eliminar</a>
                     </td>

@@ -1,4 +1,6 @@
 {% extends 'app/header.html' %}
+{% load context_processors %}
+
 
 {% block title %}Gestionar Servicios{% endblock %}
 
@@ -28,7 +30,7 @@
                             <ul class="list-group list-group-flush">
                                 {% for subcat in servicio.subcategorias.all %}
                                     <li class="list-group-item">
-                                        {{ subcat.nombre }} - ${{ subcat.precio_base|floatformat:0 }}
+                                        {{ subcat.nombre }} - ${{ subcat.precio_base|formato_precio }}
                                         <span class="text-muted">({{ subcat.duracion_estimada }} horas)</span>
                                     </li>
                                 {% endfor %}

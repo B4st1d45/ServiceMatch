@@ -52,7 +52,7 @@ urlpatterns = [
     path('editar_perfil_profesional/', views.editar_perfil_profesional, name='editar_perfil_profesional'),
     path('calendario_profesional/', views.calendario_reservas, name='calendario_reservas'),
     path('reservas/json/', views.reservas_json, name='reservas_json'),
-     path('editar-disponibilidad/', views.editar_disponibilidad, name='editar_disponibilidad'),
+    path('editar-disponibilidad/', views.editar_disponibilidad, name='editar_disponibilidad'),
     
     path('crear_reserva/', views.crear_reserva, name='crear_reserva'),
     path('ver-mis-reservas/', views.ver_mis_reservas, name='ver_mis_reservas'),
@@ -61,6 +61,7 @@ urlpatterns = [
     path('estadisticas/', views.obtener_estadisticas_reservas, name='estadisticas_reservas'),
     path('estadisticas/tarjetas/', obtener_estadisticas_tarjetas, name='obtener_estadisticas_tarjetas'),
     path('filtro_reservas/', views.filtrar_reservas, name='filtrar_reservas'),
+    path('confirmar-pago/<int:reserva_id>/', views.confirmar_pago, name='confirmar_pago'),
     
     path('cliente_home/', views.cliente_home, name='cliente_home'),
     path('actualizar_cliente/', views.actualizar_cliente, name='actualizar_cliente'),

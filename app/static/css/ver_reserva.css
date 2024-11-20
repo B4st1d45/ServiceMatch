@@ -1,0 +1,90 @@
+/* Contenedor principal */
+.container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
+}
+
+/* Título principal */
+.container h1 {
+    font-size: 24px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+/* Tabla de reservas */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+/* Estilo de encabezados */
+.table thead th {
+    background-color: #612545 !important;
+    color: #fff;
+    text-align: left;
+    padding: 10px;
+    border-bottom: 2px solid #ddd;
+}
+
+/* Filas de la tabla */
+.table tbody tr {
+    border-bottom: 1px solid #ddd;
+    transition: background-color 0.3s ease;
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Hover en filas */
+.table tbody tr:hover {
+    background-color: #f1f8e9;
+}
+
+/* Celdas de la tabla */
+.table td {
+    padding: 10px;
+    color: #555;
+}
+
+/* Botón de eliminar */
+.btn-danger {
+    display: inline-block;
+    padding: 8px 15px;
+    color: #fff;
+    background-color: #612545  !important;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.btn-danger:hover {
+    background-color: #431F32 !important;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    .table thead th, table td {
+        padding: 8px;
+        font-size: 13px;
+    }
+
+    .title {
+        font-size: 22px;
+    }
+}

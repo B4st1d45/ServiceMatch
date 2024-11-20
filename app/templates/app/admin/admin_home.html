@@ -1,4 +1,6 @@
 {% extends 'app/header.html' %}
+{% load context_processors %}
+
 
 {% block title %}Bienvenido Admin{% endblock %}
 
@@ -38,11 +40,11 @@
         <div class="card-container-gains">
             <div class="card">
                 <h4>Promedio mensual $</h4>
-                <p>${{ promedio_mensual }}</p>
+                <p>${{ promedio_mensual|formato_precio }}</p>
             </div>
             <div class="card">
                 <h4>Ganancias</h4>
-                <p>${{ ganancias }}</p>
+                <p>${{ ganancias|formato_precio }}</p>
             </div>
         </div>    
 

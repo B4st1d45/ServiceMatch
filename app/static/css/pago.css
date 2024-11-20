@@ -1,0 +1,79 @@
+/* Estilos generales para el contenedor */
+.container-pago {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Encabezado */
+.container-pago h1 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Párrafos con información */
+.container-pago p {
+    font-size: 16px;
+    color: #555;
+    margin: 10px 0;
+}
+
+/* Botones */
+.container-pago .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    margin: 10px 5px;
+}
+
+/* Botón de simular pago */
+.container-pago .btn-pago {
+    background-color: #630D3B;
+}
+
+.container-pago .btn-pago:hover {
+    background-color: #3b0723;
+    color: #fff;
+}
+
+/* Botón de cancelar */
+.container-pago .btn-cancelar {
+    background-color: #693752; /* Rojo */
+}
+
+.container-pago .btn-cancelar:hover {
+    background-color: #492639;
+    color: #fff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container-pago {
+        padding: 15px;
+    }
+
+    .container-pago h1 {
+        font-size: 20px;
+    }
+
+    .container-pago p {
+        font-size: 14px;
+    }
+
+    .container-pago .btn {
+        font-size: 14px;
+        padding: 8px 15px;
+    }
+}

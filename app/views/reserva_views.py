@@ -35,8 +35,8 @@ def crear_reserva(request):
 
         try:
             reserva.save()
-            messages.success(request, 'Reserva creada exitosamente.')
-            return redirect('ver_mis_reservas')
+            messages.success(request, 'Reserva creada exitosamente. Procede a confirmar el pago.')
+            return redirect('confirmar_pago', reserva_id=reserva.id)
         except ValidationError as e:
             messages.error(request, e.message)
             return redirect('crear_reserva')
@@ -86,3 +86,16 @@ def eliminar_reserva(request, reserva_id):
 def reservas_totales(request):
     reservas = Reserva.objects.select_related('profesional', 'usuario').all()
     return render(request, 'app/admin/reservas_totales.html', {'reservas': reservas})
+
+@login_required
+def confirmar_pago(request, reserva_id):
+    reserva = get_object_or_404(Reserva, id=reserva_id, usuario=request.user)
+    
+    if request.method == 'POST':
+        Reserva.objects.filter(id=reserva.id).update(estado='pendiente')
+        messages.success(request, 'Pago realizado con éxito. Tu reserva ha sido confirmada.')
+        return redirect('ver_mis_reservas')
+    
+    return render(request, 'app/pago/confirmar_pago.html', {
+        'reserva': reserva,
+    })

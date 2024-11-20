@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app',
     'drf_yasg',
+    'django.contrib.humanize',
 ]
 
 AUTH_USER_MODEL = 'app.Usuario'  
