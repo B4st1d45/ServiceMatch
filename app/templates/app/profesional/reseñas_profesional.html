@@ -1,0 +1,22 @@
+{% extends 'app/header.html' %}
+
+{% block title %}Reseñas de Profesionales{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Reseñas de {{ profesional.nombre }} {{ profesional.apellido }}</h2>
+    <div class="reseñas-list d-flex flex-wrap">
+        {% for reseña in reseñas %}
+        <div class="card m-2" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">{{ reseña.calificacion }} Estrellas</h5>
+                <p class="card-text">{{ reseña.comentario }}</p>
+                <p class="text-muted">{{ reseña.fecha|date:"d M Y" }}</p>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center">No hay reseñas aún.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

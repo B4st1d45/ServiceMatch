@@ -1,9 +1,9 @@
-from django.http import HttpResponseForbidden
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from app.models import Reserva, Usuario, Reseña
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseForbidden
 
 
 
@@ -77,17 +77,6 @@ def actualizar_cliente(request):
     return render(request, 'app/cliente/actualizar_cliente.html', {'cliente': cliente})
 
 @login_required
-def ver_reservas_profesional(request, profesional_id):
-    profesional = get_object_or_404(Usuario, id=profesional_id)
-    
-    if request.user.rol != 'cliente':
-        return HttpResponseForbidden("No tienes permisos para acceder a esta página.")
-    
-    reservas = Reserva.objects.filter(profesional=profesional)
-    return render(request, 'app/cliente/ver_reservas_profesional.html', {'profesional': profesional, 'reservas': reservas})
-
-
-@login_required
 def calificar_profesional(request, profesional_id):
     profesional = get_object_or_404(Usuario, id=profesional_id)
 
@@ -122,6 +111,6 @@ def calificar_profesional(request, profesional_id):
 @login_required
 def reservas_totales_cliente(request):
     reservas = Reserva.objects.filter(usuario=request.user).select_related('profesional', 'subcategoria').order_by('-fecha')
-    return render(request, 'app/reservas_totales_cliente.html', {
+    return render(request, 'app/cliente/reservas_totales_cliente.html', {
         'reservas': reservas,
     })

@@ -1,12 +1,14 @@
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import render, redirect
 from app import models
 from app.models import Reserva, Usuario, Reseña
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from datetime import datetime, timedelta
-from django.utils import formats
 from django.http import JsonResponse
+from django.db.models import Avg
 
+
+@login_required
 def profesional_home(request):
     if not request.user.is_authenticated or request.user.rol != 'profesional':
         return redirect('home')
@@ -27,7 +29,7 @@ def profesional_home(request):
 
     calificaciones = Reseña.objects.filter(profesional=request.user)
     if calificaciones.exists():
-        calificacion_promedio = calificaciones.aggregate(models.Avg('calificacion'))['calificacion__avg']
+        calificacion_promedio = calificaciones.aggregate(Avg('calificacion'))['calificacion__avg']
     else:
         calificacion_promedio = 0
 
@@ -39,8 +41,8 @@ def profesional_home(request):
     context = {
         'reservas_semana': reservas_semana,
         'reservas_mes': reservas_mes,
-        #'calificacion_promedio': calificacion_promedio,
-        #'clientes_atendidos': clientes_atendidos,
+        'calificacion_promedio': calificacion_promedio,
+        'clientes_atendidos': clientes_atendidos,
     }
     return render(request, 'app/profesional/profesional_home.html', context)
 
@@ -141,9 +143,21 @@ def editar_disponibilidad(request):
 
     return render(request, 'app/profesional/editar_disponibilidad.html', {'profesional': profesional})
 
+
 @login_required
 def reservas_totales_profesional(request):
     reservas = Reserva.objects.filter(profesional=request.user).select_related('usuario', 'subcategoria').order_by('-fecha')
     return render(request, 'app/profesional/reservas_totales_profesional.html', {
         'reservas': reservas,
+    })
+
+
+
+@login_required
+def reseñas_profesional(request):
+    profesional = request.user
+    reseñas = Reseña.objects.filter(profesional=profesional).order_by('-fecha')
+    return render(request, 'app/profesional/reseñas_profesional.html', {
+        'profesional': profesional,
+        'reseñas': reseñas,
     })

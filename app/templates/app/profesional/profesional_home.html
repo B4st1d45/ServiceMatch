@@ -13,7 +13,6 @@
             <li><a href="{% url 'calendario_reservas' %}" class="btn-sidebar">Calendario de Reservas</a></li>
             <li><a href="{% url 'reservas_totales_profesional' %}" class="btn-sidebar">Historial de Reservas</a></li>
         </ul>
-        
     </div>
 
     <div class="main-content">
@@ -30,7 +29,6 @@
                 <button type="submit" class="availability-button">Actualizar</button>
             </form>
         </div>
-
         <!-- reservas -->
         <div class="resumen-section">
             <h2>Próximas Reservas</h2>
@@ -52,10 +50,10 @@
                 <h4>Reservas del Mes</h4>
                 <p>{{ reservas_mes }}</p>
             </div>
-            <div class="card">
+            <a href="{% url 'reseñas_profesional' %}" class="card">
                 <h4>Calificación Promedio</h4>
-                <p id="rating-stars" class="rating">{{ calificacion_promedio }}</p>
-            </div>
+                <p id="rating-stars" class="rating">{{ calificacion_promedio|floatformat:1 }}</p>
+            </a>
             <div class="card">
                 <h4>Clientes atendidos</h4>
                 <p>{{ clientes_atendidos }}</p>
