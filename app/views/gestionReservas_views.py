@@ -3,7 +3,6 @@ from django.http import JsonResponse
 from django.db.models import Count
 from django.contrib.auth.decorators import login_required
 
-# Mapear los estados desde el modelo para evitar valores "duros"
 ESTADOS_RESERVA = {
     'completada': 'Completadas',
     'pendiente': 'Pendientes',

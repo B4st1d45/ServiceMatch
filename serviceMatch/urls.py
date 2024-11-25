@@ -59,6 +59,7 @@ urlpatterns = [
     path('crear_reserva/', views.crear_reserva, name='crear_reserva'),
     path('ver-mis-reservas/', views.ver_mis_reservas, name='ver_mis_reservas'),
     path('eliminar_reserva/<int:reserva_id>/', views.eliminar_reserva, name='eliminar_reserva'),
+    path('reseña/<int:profesional_id>/', views.resena_profesional, name='resena_profesional'),
 
     path('estadisticas/', views.obtener_estadisticas_reservas, name='estadisticas_reservas'),
     path('estadisticas/tarjetas/', obtener_estadisticas_tarjetas, name='obtener_estadisticas_tarjetas'),

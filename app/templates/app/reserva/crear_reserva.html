@@ -34,7 +34,7 @@
 
         <!-- Selección de Profesional -->
         <label class="label-cajitas" for="profesional">Selecciona el Profesional:</label>
-        <select id="profesional" name="profesional" required>
+        <select id="profesional" name="profesional" required onchange="actualizarEstrellas()">
             <option value="" disabled selected>Elige un profesional</option>
         </select>
 
@@ -50,6 +50,11 @@
             <p><strong>Precio del Servicio:</strong> <span id="precio_servicio">0</span></p>
         </div>
 
+        <!-- Estrellas de Calificación del Profesional -->
+        <div>
+            <p><strong>Calificación del Profesional:</strong> <a id="enlace_calificacion" href="#"><span id="calificacion_profesional"></span></a></p>
+        </div>
+
         <!-- Botones -->
         <div class="botones-reserva">
             <button type="submit" class="btn btn-reserva">Hacer Reserva</button>
@@ -59,7 +64,6 @@
 </div>
 
 <script>
-    // Subcategorías por Servicio
     const subcategoriasPorServicio = {
         {% for servicio in servicios %}
         "{{ servicio.id }}": [
@@ -70,7 +74,6 @@
         {% endfor %}
     };
 
-    // Profesionales por Servicio
     const profesionalesPorServicio = {
         {% for servicio in servicios %}
         "{{ servicio.id }}": [
@@ -79,7 +82,8 @@
             {
                 "id": "{{ profesional.id }}",
                 "nombre": "{{ profesional.nombre }}",
-                "apellido": "{{ profesional.apellido }}"
+                "apellido": "{{ profesional.apellido }}",
+                "calificacion": {{ profesional.calificacion_promedio|default:0 }}
             },
             {% endif %}
             {% endfor %}
@@ -87,7 +91,6 @@
         {% endfor %}
     };
 
-    // Filtrar subcategorías al seleccionar servicio
     function filtrarSubcategorias() {
         const servicioSelect = document.getElementById('servicio');
         const subcategoriaSelect = document.getElementById('subcategoria');
@@ -104,7 +107,6 @@
         });
     }
 
-    // Actualizar precio al seleccionar subcategoría
     function actualizarPrecio() {
         const subcategoriaSelect = document.getElementById('subcategoria');
         const selectedOption = subcategoriaSelect.options[subcategoriaSelect.selectedIndex];
@@ -112,7 +114,6 @@
         document.getElementById('precio_servicio').textContent = precio.toLocaleString('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 });
     }
 
-    // Filtrar profesionales al seleccionar servicio
     function filtrarProfesionales() {
         const servicioSelect = document.getElementById('servicio');
         const profesionalSelect = document.getElementById('profesional');
@@ -124,8 +125,17 @@
             const option = document.createElement('option');
             option.value = profesional.id;
             option.textContent = `${profesional.nombre} ${profesional.apellido}`;
+            option.dataset.calificacion = profesional.calificacion;
             profesionalSelect.appendChild(option);
         });
+    }
+
+    function actualizarEstrellas() {
+        const profesionalSelect = document.getElementById('profesional');
+        const selectedOption = profesionalSelect.options[profesionalSelect.selectedIndex];
+        let calificacion = parseFloat(selectedOption.dataset.calificacion || "0");
+        document.getElementById('calificacion_profesional').textContent = `${calificacion.toFixed(1)} estrellas`;
+        document.getElementById('enlace_calificacion').href = "{% url 'resena_profesional' 0 %}".replace('/0/', '/' + selectedOption.value + '/'); 
     }
 </script>
 {% endblock %}

@@ -4,8 +4,9 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import datetime
 from django.core.exceptions import ValidationError 
-from app.models import Servicio, Subcategoria, Usuario, Reserva
+from app.models import Servicio, Subcategoria, Usuario, Reserva, Reseña
 from django.http import JsonResponse
+from django.db.models import Avg
 
 
 @login_required
@@ -16,15 +17,12 @@ def crear_reserva(request):
         fecha = request.POST.get('fecha')
         hora = request.POST.get('hora')
 
-        # Concatenar fecha y hora en un solo campo DateTime
         fecha_hora = datetime.strptime(f"{fecha} {hora}", '%Y-%m-%d %H:%M')
         fecha_hora = timezone.make_aware(fecha_hora)
 
-        # Obtener el profesional y subcategoría, asegurándose de que existen
         profesional = get_object_or_404(Usuario, id=profesional_id, rol='profesional')
         subcategoria = get_object_or_404(Subcategoria, id=subcategoria_id)
 
-        # Crear la reserva
         reserva = Reserva(
             usuario=request.user,
             profesional=profesional,
@@ -42,9 +40,13 @@ def crear_reserva(request):
             return redirect('crear_reserva')
     
     else:
-        # Obtener todos los servicios y profesionales activos para la página de creación de reservas
         servicios = Servicio.objects.all()
         profesionales = Usuario.objects.filter(rol='profesional', estado='activo')
+
+        # Calcular el promedio de calificación para cada profesional
+        for profesional in profesionales:
+            profesional.calificacion_promedio = Reseña.objects.filter(profesional=profesional).aggregate(Avg('calificacion'))['calificacion__avg'] or 0
+        
         return render(request, 'app/reserva/crear_reserva.html', {
             'servicios': servicios,
             'profesionales': profesionales,
@@ -98,4 +100,14 @@ def confirmar_pago(request, reserva_id):
     
     return render(request, 'app/pago/confirmar_pago.html', {
         'reserva': reserva,
+    })
+    
+
+@login_required
+def resena_profesional(request, profesional_id):
+    profesional = get_object_or_404(Usuario, id=profesional_id, rol='profesional')
+    reseñas = Reseña.objects.filter(profesional=profesional).order_by('-fecha')
+    return render(request, 'app/reserva/reseña.html', {
+        'profesional': profesional,
+        'reseñas': reseñas,
     })
