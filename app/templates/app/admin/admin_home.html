@@ -1,7 +1,6 @@
 {% extends 'app/header.html' %}
 {% load context_processors %}
 
-
 {% block title %}Bienvenido Admin{% endblock %}
 
 {% block content %}
@@ -15,19 +14,18 @@
             <li><a href="{% url 'gestionar_profesionales' %}" class="btn-sidebar">Gestionar Profesionales</a></li>
             <li><a href="{% url 'gestionar_profesion' %}" class="btn-sidebar">Gestionar Servicios</a></li>
         </ul>
-        
     </div>
 
     <!-- Gráfico de estadísticas -->
     <div class="main-content">
-        <h3>Estadísticas</h3> 
+        <h3>Estadísticas</h3>
         <input type="date" id="datePicker" class="date-picker">
 
         <div class="card-container">
-            <div class="card">
+            <a href="{% url 'reservas_filtro' %}" class="card">
                 <h4>Reservas</h4>
                 <p>{{ total_reservas }}</p>
-            </div>
+            </a>
             <div class="card">
                 <h4>Reservas completadas</h4>
                 <p>{{ reservas_completadas }}</p>
@@ -36,7 +34,7 @@
                 <h4>Usuarios</h4>
                 <p>{{ total_usuarios }}</p>
             </div>
-        </div>    
+        </div>
         <div class="card-container-gains">
             <div class="card">
                 <h4>Promedio mensual $</h4>
@@ -46,7 +44,7 @@
                 <h4>Ganancias</h4>
                 <p>${{ ganancias|formato_precio }}</p>
             </div>
-        </div>    
+        </div>
 
         <div class="chart-container">
             <canvas id="myChart" width="400" height="200"></canvas>
@@ -106,10 +104,7 @@
 
     window.onload = cargarGrafico;
 
-    // Obtener la fecha de hoy en el formato YYYY-MM-DD
     const today = new Date().toISOString().split('T')[0];
-    // Establecer el valor del input
     document.getElementById("datePicker").value = today;
 </script>
 {% endblock %}
-

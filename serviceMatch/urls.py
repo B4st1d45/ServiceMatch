@@ -46,6 +46,7 @@ urlpatterns = [
     path('eliminar_profesion/<int:servicio_id>/', views.eliminar_profesion, name='eliminar_profesion'),
 
     path('reservas_totales/', views.reservas_totales, name='reservas_totales'),
+    path('reservas_filtro/', views.reservas_filtro, name='reservas_filtro'),
 
     path('dashboard_profesional/', views.dashboard_profesional, name='dashboard_profesional'),
     path('profesional_home/', views.profesional_home, name='profesional_home'),
@@ -55,6 +56,7 @@ urlpatterns = [
     path('editar-disponibilidad/', views.editar_disponibilidad, name='editar_disponibilidad'),
     path('reservas_totales_profesional/', views.reservas_totales_profesional, name='reservas_totales_profesional'), 
     path('reseñas_profesional/', views.reseñas_profesional, name='reseñas_profesional'),
+    
 
     path('crear_reserva/', views.crear_reserva, name='crear_reserva'),
     path('ver-mis-reservas/', views.ver_mis_reservas, name='ver_mis_reservas'),

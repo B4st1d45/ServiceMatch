@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from app.models import Servicio, Subcategoria, Usuario, Reserva, Reseña
 from django.http import JsonResponse
 from django.db.models import Avg
+from decimal import Decimal
 
 
 @login_required
@@ -22,6 +23,13 @@ def crear_reserva(request):
 
         profesional = get_object_or_404(Usuario, id=profesional_id, rol='profesional')
         subcategoria = get_object_or_404(Subcategoria, id=subcategoria_id)
+
+        # Verificar si el cliente ya tiene alguna reserva
+        reservas_cliente = Reserva.objects.filter(usuario=request.user).exists()
+        if not reservas_cliente:
+            # Aplicar 20% de descuento en la tarifa del servicio
+            descuento = Decimal('0.20')
+            subcategoria.precio_base = subcategoria.precio_base * (Decimal('1.00') - descuento)
 
         reserva = Reserva(
             usuario=request.user,

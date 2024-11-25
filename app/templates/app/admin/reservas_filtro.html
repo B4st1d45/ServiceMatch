@@ -1,0 +1,32 @@
+{% extends 'app/header.html' %}
+
+{% block title %}Estadísticas de Reservas{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Estadísticas de Reservas por Servicio y Subcategoría</h2>
+    <div class="row">
+        {% for servicio in servicios_reservas %}
+        <div class="col-md-6 d-flex align-items-stretch mb-4">
+            <div class="card w-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ servicio.servicio__nombre }}</h5>
+                    <span style="font-size: 0.9em;">Reservas totales del servicio: {{ servicio.total_reservas }}</span>
+                    <hr>
+                    {% for subcategoria in servicio.subcategorias %}
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">{{ subcategoria.nombre }}</h6>
+                            <p class="card-text">
+                                <span style="font-size: 0.9em;">Reservas en esta subcategoría: {{ subcategoria.total_reservas }}</span><br>
+                            </p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
