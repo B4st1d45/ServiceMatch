@@ -6,6 +6,26 @@ from datetime import datetime
 
 @login_required
 def filtrar_reservas(request):
+    """
+    Filtra las reservas entre dos fechas proporcionadas por el usuario.
+
+    Este endpoint permite filtrar las reservas entre una fecha de inicio y una fecha de fin
+    proporcionadas en los parámetros de la solicitud GET. Si las fechas son válidas, se devuelve
+    una lista de las reservas filtradas.
+
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP que contiene los parámetros de fechaInicio
+                               y fechaFin.
+
+    Returns:
+        JsonResponse: Un objeto JSON que contiene las reservas filtradas entre las fechas especificadas.
+                      En caso de error, devuelve un mensaje de error en formato JSON con un código de estado.
+    
+    Errores posibles:
+        - 400 Bad Request: Si las fechas no son proporcionadas o son inválidas.
+        - 400 Bad Request: Si la fecha de inicio es posterior a la fecha de fin.
+        - 400 Bad Request: Si el formato de las fechas es incorrecto.
+    """
     fecha_inicio = request.GET.get('fechaInicio')
     fecha_fin = request.GET.get('fechaFin')
 

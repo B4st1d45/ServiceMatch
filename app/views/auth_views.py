@@ -5,9 +5,19 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth import authenticate, login as auth_login
+from django.http import JsonResponse
 
 @csrf_protect
 def user_login(request):
+    """
+    Maneja el inicio de sesión de los usuarios.
+
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+
+    Returns:
+        HttpResponse: Redirige según el rol del usuario autenticado o muestra mensajes de error.
+    """
     list(messages.get_messages(request))
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -36,6 +46,15 @@ def user_login(request):
     return render(request, 'app/auth/login.html')
 
 def user_logout(request):
+    """
+    Maneja el cierre de sesión de los usuarios.
+
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+
+    Returns:
+        HttpResponse: Redirige a la página de inicio de sesión después de cerrar sesión.
+    """
     list(messages.get_messages(request))
     auth_logout(request)
     
@@ -43,6 +62,15 @@ def user_logout(request):
     return redirect('login')
 
 def user_register(request):
+    """
+    Maneja el registro de nuevos usuarios.
+
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+
+    Returns:
+        HttpResponse: Renderiza la página de registro o redirige tras el registro exitoso.
+    """
     if request.method == 'POST':
         # datos del formulario
         nombre = request.POST.get('first_name')
@@ -92,4 +120,13 @@ def user_register(request):
     return render(request, 'app/auth/register.html')
 
 def terminos(request):
+    """
+    Renderiza la página de términos y condiciones.
+
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+
+    Returns:
+        HttpResponse: Renderiza la plantilla de términos y condiciones.
+    """
     return render(request, 'app/auth/terminos.html')

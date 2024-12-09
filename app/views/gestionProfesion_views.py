@@ -14,11 +14,36 @@ def es_admin(user):
 
 @user_passes_test(es_admin)
 def gestionar_profesion(request):
+    """
+    Muestra una lista de servicios disponibles para la administración.
+
+    Solo los usuarios con permisos de administrador pueden acceder a esta vista.
+    Se muestra una lista con todos los servicios registrados en el sistema.
+
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP que contiene los datos de la solicitud.
+
+    Returns:
+        HttpResponse: Renderiza la plantilla 'gestionar_profesion.html' con la lista de servicios.
+    """
     servicios = Servicio.objects.all()
     return render(request, 'app/admin/gestionar_profesion.html', {'servicios': servicios})
 
 @user_passes_test(es_admin)
 def agregar_profesion(request):
+    """
+    Permite agregar un nuevo servicio y sus subcategorías asociadas.
+
+    Solo los usuarios con permisos de administrador pueden acceder a esta vista.
+    Se debe ingresar un nombre para el servicio y luego las subcategorías correspondientes.
+    Si algún dato de las subcategorías es incompleto, se muestra un mensaje de error.
+
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP que contiene los datos del formulario.
+
+    Returns:
+        HttpResponse: Redirige a la vista de gestión de profesiones después de agregar el servicio.
+    """
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
 
@@ -51,7 +76,22 @@ def agregar_profesion(request):
     return render(request, 'app/admin/agregar_profesion.html')
 
 def validar_subcategoria(nombre, precio, duracion):
-    """Valida los datos de una subcategoría."""
+    """
+    Valida los datos de una subcategoría.
+
+    Verifica que todos los campos de la subcategoría sean válidos. El precio debe ser un número decimal y
+    la duración debe ser un número entero. También verifica que todos los campos estén presentes.
+
+    Args:
+        nombre (str): Nombre de la subcategoría.
+        precio (str): Precio base de la subcategoría.
+        duracion (str): Duración estimada de la subcategoría.
+
+    Returns:
+        tuple: Una tupla con un valor booleano que indica si la validación fue exitosa y un mensaje
+               que describe el resultado de la validación.
+    """
+    # Valida los datos de una subcategoría.
     if not (nombre and precio and duracion):
         return False, "Faltan datos obligatorios."
     try:
@@ -63,6 +103,19 @@ def validar_subcategoria(nombre, precio, duracion):
 
 @user_passes_test(es_admin)
 def actualizar_profesion(request, servicio_id):
+    """
+    Permite actualizar un servicio y sus subcategorías asociadas.
+
+    Solo los usuarios con permisos de administrador pueden acceder a esta vista.
+    Se pueden actualizar el nombre del servicio, las subcategorías existentes, eliminar subcategorías y agregar nuevas subcategorías.
+
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP que contiene los datos del formulario.
+        servicio_id (int): ID del servicio que se desea actualizar.
+
+    Returns:
+        HttpResponse: Renderiza la plantilla 'actualizar_profesion.html' con el servicio y sus subcategorías.
+    """
     servicio = get_object_or_404(Servicio, id=servicio_id)
     subcategorias_existentes = servicio.subcategorias.all()
     todas_las_subcategorias = Subcategoria.objects.all()
@@ -127,6 +180,19 @@ def actualizar_profesion(request, servicio_id):
 
 @user_passes_test(es_admin)
 def eliminar_profesion(request, servicio_id):
+    """
+    Permite eliminar un servicio del sistema.
+
+    Solo los usuarios con permisos de administrador pueden acceder a esta vista.
+    Esta vista muestra un mensaje de confirmación antes de eliminar el servicio.
+
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP que contiene la confirmación de eliminación.
+        servicio_id (int): ID del servicio que se desea eliminar.
+
+    Returns:
+        HttpResponse: Redirige a la vista de gestión de profesiones después de eliminar el servicio.
+    """
     servicio = get_object_or_404(Servicio, id=servicio_id)
 
     if request.method == 'POST':
@@ -139,6 +205,17 @@ def eliminar_profesion(request, servicio_id):
 
 # validaciones para hacer una reserva exitosa
 def validar_disponibilidad(profesional, fecha, hora):
+    """
+    Verifica la disponibilidad de un profesional para una reserva en una fecha y hora específicas.
+
+    Args:
+        profesional (Profesional): El profesional que se está verificando.
+        fecha (date): La fecha en la que se quiere hacer la reserva.
+        hora (time): La hora en la que se quiere hacer la reserva.
+
+    Raises:
+        ValidationError: Si el horario de la reserva no está disponible o si el profesional ya tiene una reserva en ese horario.
+    """
     fecha_hora_reserva = datetime.combine(fecha, hora)
     rango_horario_inicio = datetime.strptime(profesional.horario_inicio, '%H:%M').time()
     rango_horario_fin = datetime.strptime(profesional.horario_fin, '%H:%M').time()
@@ -153,10 +230,34 @@ def validar_disponibilidad(profesional, fecha, hora):
             raise ValidationError("El profesional ya tiene una reserva en este horario.")
         
 def validar_dia_habil(fecha):
+    """
+    Valida si la fecha de la reserva corresponde a un día hábil (lunes a viernes).
+
+    Si la fecha corresponde a un sábado o domingo, se genera un error indicando que
+    solo se puede realizar reservas de lunes a viernes.
+
+    Args:
+        fecha (date): La fecha de la reserva a validar.
+
+    Raises:
+        ValidationError: Si la fecha corresponde a un sábado o domingo.
+    """
     if fecha.weekday() >= 5:  # 5 = Sábado, 6 = Domingo
         raise ValidationError("Solo puedes reservar de lunes a viernes.")
     
 def validar_fecha_futura(fecha):
+    """
+    Valida si la fecha de la reserva es futura y tiene al menos 24 horas de anticipación.
+
+    Compara la fecha de la reserva con la fecha actual. Si la fecha es pasada o no cumple con
+    el requisito de al menos 24 horas de anticipación, se genera un error.
+
+    Args:
+        fecha (date): La fecha de la reserva a validar.
+
+    Raises:
+        ValidationError: Si la fecha es pasada o no cumple con el requisito de 24 horas de anticipación.
+    """
     hoy = datetime.now().date()
     if fecha <= hoy:
         raise ValidationError("La reserva debe ser para una fecha futura.")

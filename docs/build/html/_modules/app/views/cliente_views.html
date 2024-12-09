@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+
+<html lang="es" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>app.views.cliente_views &#8212; documentación de ServiceMatch - 09 de diciembre, 2024</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../../_static/documentation_options.js?v=bf1a0fe4"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/translations.js?v=f85f4cfb"></script>
+    <link rel="index" title="Índice" href="../../../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Código fuente para app.views.cliente_views</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span><span class="p">,</span><span class="n">redirect</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
+<span class="kn">from</span> <span class="nn">app.models</span> <span class="kn">import</span> <span class="n">Reserva</span><span class="p">,</span> <span class="n">Usuario</span><span class="p">,</span> <span class="n">Reseña</span>
+<span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">messages</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">get_object_or_404</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponseForbidden</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">JsonResponse</span>
+
+<div class="viewcode-block" id="cliente_home">
+<a class="viewcode-back" href="../../../views.html#app.views.cliente_views.cliente_home">[documentos]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">cliente_home</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Renderiza la página de inicio del cliente.</span>
+
+<span class="sd">    Proporciona estadísticas sobre las reservas del cliente y muestra una lista de los profesionales asociados con él.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request (HttpRequest): Solicitud HTTP.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HttpResponse: Página HTML con la información del cliente y sus estadísticas.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cliente</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+    <span class="n">reservas</span> <span class="o">=</span> <span class="n">Reserva</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">usuario</span><span class="o">=</span><span class="n">cliente</span><span class="p">)</span>
+    <span class="n">reservas_totales</span> <span class="o">=</span> <span class="n">reservas</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+    <span class="n">reservas_completadas</span> <span class="o">=</span> <span class="n">reservas</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">estado</span><span class="o">=</span><span class="s1">&#39;completada&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+    <span class="n">reservas_pendientes</span> <span class="o">=</span> <span class="n">reservas</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">estado</span><span class="o">=</span><span class="s1">&#39;pendiente&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">cliente</span><span class="o">.</span><span class="n">rol</span> <span class="o">!=</span> <span class="s1">&#39;cliente&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponseForbidden</span><span class="p">(</span><span class="s2">&quot;No tienes permisos para acceder a esta página.&quot;</span><span class="p">)</span>
+    
+    <span class="n">profesionales</span> <span class="o">=</span> <span class="n">Usuario</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">reservas_cliente__usuario</span><span class="o">=</span><span class="n">cliente</span><span class="p">,</span> 
+        <span class="n">rol</span><span class="o">=</span><span class="s1">&#39;profesional&#39;</span><span class="p">,</span>
+        <span class="n">reservas_cliente__estado</span><span class="o">=</span><span class="s1">&#39;completada&#39;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">distinct</span><span class="p">()</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span><span class="s1">&#39;reservas_cliente&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">profesional</span> <span class="ow">in</span> <span class="n">profesionales</span><span class="p">:</span>
+        <span class="n">profesional</span><span class="o">.</span><span class="n">reserva</span> <span class="o">=</span> <span class="n">reservas</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">profesional</span><span class="o">=</span><span class="n">profesional</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+
+    <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;cliente&#39;</span><span class="p">:</span> <span class="n">cliente</span><span class="p">,</span>
+        <span class="s1">&#39;reservas&#39;</span><span class="p">:</span> <span class="n">reservas</span><span class="p">,</span>
+        <span class="s1">&#39;reservas_totales&#39;</span><span class="p">:</span> <span class="n">reservas_totales</span><span class="p">,</span>
+        <span class="s1">&#39;reservas_completadas&#39;</span><span class="p">:</span> <span class="n">reservas_completadas</span><span class="p">,</span>
+        <span class="s1">&#39;reservas_pendientes&#39;</span><span class="p">:</span> <span class="n">reservas_pendientes</span><span class="p">,</span>
+        <span class="s1">&#39;profesionales&#39;</span><span class="p">:</span> <span class="n">profesionales</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;app/cliente/cliente_home.html&#39;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="actualizar_cliente">
+<a class="viewcode-back" href="../../../views.html#app.views.cliente_views.actualizar_cliente">[documentos]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">actualizar_cliente</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Actualiza los datos personales del cliente autenticado.</span>
+
+<span class="sd">    Permite modificar la información personal y la contraseña del cliente.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request (HttpRequest): Solicitud HTTP con datos del formulario.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HttpResponse: Página HTML actualizada o redirección con mensajes de error o éxito.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">cliente</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">cliente</span><span class="o">.</span><span class="n">nombre</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;nombre&#39;</span><span class="p">)</span>
+        <span class="n">cliente</span><span class="o">.</span><span class="n">apellido</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;apellido&#39;</span><span class="p">)</span>
+        <span class="n">cliente</span><span class="o">.</span><span class="n">telefono</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;telefono&#39;</span><span class="p">)</span>
+        <span class="n">email</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">)</span>
+        <span class="n">nueva_contrasena</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;nueva_contrasena&#39;</span><span class="p">)</span>
+        <span class="n">confirmar_contrasena</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;confirmar_contrasena&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Verificar si el email ya existe para otro usuario</span>
+        <span class="k">if</span> <span class="n">Usuario</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">)</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">cliente</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;El correo electrónico ya está registrado.&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;actualizar_cliente&#39;</span><span class="p">)</span>
+
+        <span class="n">cliente</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="n">email</span>
+
+        <span class="c1"># Verificar si las contraseñas coinciden</span>
+        <span class="k">if</span> <span class="n">nueva_contrasena</span> <span class="ow">and</span> <span class="n">nueva_contrasena</span> <span class="o">!=</span> <span class="n">confirmar_contrasena</span><span class="p">:</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;Las contraseñas no coinciden.&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;actualizar_cliente&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">nueva_contrasena</span><span class="p">:</span>
+            <span class="n">cliente</span><span class="o">.</span><span class="n">set_password</span><span class="p">(</span><span class="n">nueva_contrasena</span><span class="p">)</span>
+
+        <span class="c1"># Guardar los cambios</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cliente</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;Información actualizada con éxito.&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Ocurrió un error: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;cliente_home&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;app/cliente/actualizar_cliente.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;cliente&#39;</span><span class="p">:</span> <span class="n">cliente</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="calificar_profesional">
+<a class="viewcode-back" href="../../../views.html#app.views.cliente_views.calificar_profesional">[documentos]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">calificar_profesional</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">profesional_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Permite a un cliente calificar a un profesional.</span>
+
+<span class="sd">    Registra una reseña con una calificación y un comentario opcional.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request (HttpRequest): Solicitud HTTP con datos del formulario.</span>
+<span class="sd">        profesional_id (int): ID del profesional a calificar.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HttpResponse: Página HTML con el resultado de la operación.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">profesional</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Usuario</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">profesional_id</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">calificacion</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;calificacion&#39;</span><span class="p">)</span>
+        <span class="n">comentario</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;comentario&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">calificacion</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">calificacion</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="ow">or</span> <span class="nb">int</span><span class="p">(</span><span class="n">calificacion</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;La calificación debe estar entre 1 y 5 estrellas.&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;cliente_home&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">comentario</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">comentario</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">500</span><span class="p">:</span>  <span class="c1"># Limitar el tamaño del comentario</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;El comentario no puede tener más de 500 caracteres.&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;cliente_home&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">calificacion</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;La calificación debe estar entre 1 y 5 estrellas.&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;cliente_home&#39;</span><span class="p">)</span>
+
+        <span class="n">cliente</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+
+        <span class="c1"># Crear y guardar la nueva reseña</span>
+        <span class="n">nueva_resenia</span> <span class="o">=</span> <span class="n">Reseña</span><span class="p">(</span><span class="n">usuario</span><span class="o">=</span><span class="n">cliente</span><span class="p">,</span> <span class="n">profesional</span><span class="o">=</span><span class="n">profesional</span><span class="p">,</span> <span class="n">calificacion</span><span class="o">=</span><span class="n">calificacion</span><span class="p">,</span> <span class="n">comentario</span><span class="o">=</span><span class="n">comentario</span><span class="p">)</span>
+        <span class="n">nueva_resenia</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;¡Gracias por tu reseña!&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;cliente_home&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;app/cliente/calificar.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;profesional&#39;</span><span class="p">:</span> <span class="n">profesional</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="reservas_totales_cliente">
+<a class="viewcode-back" href="../../../views.html#app.views.cliente_views.reservas_totales_cliente">[documentos]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">reservas_totales_cliente</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Lista todas las reservas realizadas por el cliente autenticado.</span>
+
+<span class="sd">    Muestra información sobre cada reserva, incluyendo el profesional asociado y la subcategoría.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request (HttpRequest): Solicitud HTTP.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HttpResponse: Página HTML con la lista de reservas.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">reservas</span> <span class="o">=</span> <span class="n">Reserva</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">usuario</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s1">&#39;profesional&#39;</span><span class="p">,</span> <span class="s1">&#39;subcategoria&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-fecha&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;app/cliente/reservas_totales_cliente.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s1">&#39;reservas&#39;</span><span class="p">:</span> <span class="n">reservas</span><span class="p">,</span>
+    <span class="p">})</span></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">ServiceMatch</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Ir a" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navegación</h3>
+<p class="caption" role="heading"><span class="caption-text">Contenido:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../views.html">Vistas del Proyecto ServiceMatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">Models en el Proyecto ServiceMatch</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Código de módulo</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Tiffani Bastidas.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

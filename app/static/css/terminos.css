@@ -1,0 +1,73 @@
+
+.terms-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Title styles */
+.terms-title {
+    font-size: 2em;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #3b1022;
+}
+
+/* Subheadings */
+.terms-heading {
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* Paragraph text */
+.terms-text {
+    font-size: 1em;
+    margin-bottom: 15px;
+    text-align: justify;
+    color: #555;
+}
+
+/* Introductory paragraph */
+.terms-intro {
+    font-size: 1.1em;
+    margin-bottom: 20px;
+    font-weight: 400;
+    text-align: justify;
+    color: #444;
+}
+
+/* Links */
+a .terms-link{
+    color: #681a3a !important;
+    text-decoration: none;
+}
+
+a .terms-link:hover {
+    text-decoration: underline;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .terms-container {
+        padding: 15px;
+    }
+
+    .terms-title {
+        font-size: 1.8em;
+    }
+
+    .terms-heading {
+        font-size: 1.2em;
+    }
+
+    .terms-text, .terms-intro {
+        font-size: 0.9em;
+    }
+}

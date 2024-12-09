@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'app',
     'drf_yasg',
     'django.contrib.humanize',
+    'rest_framework',
 ]
 
 AUTH_USER_MODEL = 'app.Usuario'  

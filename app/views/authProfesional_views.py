@@ -6,6 +6,20 @@ from django.views.decorators.csrf import csrf_protect
 
 @csrf_protect
 def login_profesional(request):
+    """
+    Maneja el inicio de sesión para usuarios con rol de 'profesional'.
+
+    Este endpoint valida las credenciales ingresadas por el usuario y verifica 
+    si el usuario tiene el rol de profesional antes de permitir el acceso.
+
+    Args:
+        request (HttpRequest): Solicitud HTTP que incluye los datos del formulario.
+
+    Returns:
+        HttpResponse: Redirección a la página del profesional si las credenciales 
+        son correctas; de lo contrario, redirige de nuevo a la página de inicio 
+        de sesión con mensajes de error.
+    """
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')

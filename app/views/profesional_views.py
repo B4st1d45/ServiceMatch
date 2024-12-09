@@ -10,6 +10,18 @@ from django.db.models import Avg
 
 @login_required
 def profesional_home(request):
+    """
+    Muestra el panel principal del profesional con estadísticas clave.
+
+    Incluye las reservas de la semana, el total de reservas del mes, la calificación promedio,
+    y la cantidad de clientes atendidos.
+
+    Args:
+        request (HttpRequest): Solicitud HTTP.
+
+    Returns:
+        HttpResponse: Renderiza el template 'profesional_home.html' con las estadísticas.
+    """
     if not request.user.is_authenticated or request.user.rol != 'profesional':
         return redirect('home')
 
@@ -46,8 +58,16 @@ def profesional_home(request):
     }
     return render(request, 'app/profesional/profesional_home.html', context)
 
-
 def dashboard_profesional(request):
+    """
+    Renderiza el dashboard del profesional con información básica.
+
+    Args:
+        request (HttpRequest): Solicitud HTTP.
+
+    Returns:
+        HttpResponse: Renderiza el template 'dashboard_profesional.html'.
+    """
     if request.user.rol != 'profesional':
         return redirect('home') 
     
@@ -63,6 +83,18 @@ def dashboard_profesional(request):
 
 @login_required
 def editar_perfil_profesional(request):
+    """
+    Permite al profesional actualizar su perfil, incluyendo contraseña y datos personales.
+
+    Realiza validaciones para evitar duplicados de correo y asegurar que las contraseñas coincidan.
+
+    Args:
+        request (HttpRequest): Solicitud HTTP.
+
+    Returns:
+        HttpResponse: Renderiza 'editar_perfil.html' para GET o redirige tras un POST exitoso.
+    """
+
     if request.user.rol != 'profesional':
         return redirect('home')
     
@@ -116,6 +148,15 @@ def reservas_json(request):
 
 @login_required
 def calendario_reservas(request):
+    """
+    Renderiza el calendario de reservas del profesional.
+
+    Args:
+        request (HttpRequest): Solicitud HTTP.
+
+    Returns:
+        HttpResponse: Renderiza el template 'calendario_reservas.html'.
+    """
     if request.user.rol == 'profesional':
         profesional = request.user
         reservas = Reserva.objects.filter(profesional=profesional)
@@ -125,6 +166,15 @@ def calendario_reservas(request):
 
 @login_required
 def editar_disponibilidad(request):
+    """
+    Permite al profesional cambiar su estado de disponibilidad (activo/inactivo).
+
+    Args:
+        request (HttpRequest): Solicitud HTTP.
+
+    Returns:
+        HttpResponse: Renderiza 'editar_disponibilidad.html' o redirige tras un POST exitoso.
+    """
     if request.user.rol != 'profesional':
         return redirect('home')
 
@@ -143,18 +193,35 @@ def editar_disponibilidad(request):
 
     return render(request, 'app/profesional/editar_disponibilidad.html', {'profesional': profesional})
 
-
 @login_required
 def reservas_totales_profesional(request):
+    """
+    Muestra todas las reservas realizadas para el profesional.
+
+    Incluye detalles como usuario y subcategoría.
+
+    Args:
+        request (HttpRequest): Solicitud HTTP.
+
+    Returns:
+        HttpResponse: Renderiza 'reservas_totales_profesional.html'.
+    """
     reservas = Reserva.objects.filter(profesional=request.user).select_related('usuario', 'subcategoria').order_by('-fecha')
     return render(request, 'app/profesional/reservas_totales_profesional.html', {
         'reservas': reservas,
     })
 
-
-
 @login_required
 def reseñas_profesional(request):
+    """
+    Muestra todas las reseñas asociadas al profesional, ordenadas por fecha.
+
+    Args:
+        request (HttpRequest): Solicitud HTTP.
+
+    Returns:
+        HttpResponse: Renderiza 'reseñas_profesional.html'.
+    """
     profesional = request.user
     reseñas = Reseña.objects.filter(profesional=profesional).order_by('-fecha')
     return render(request, 'app/profesional/reseñas_profesional.html', {

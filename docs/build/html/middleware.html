@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+
+<html lang="es" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Middleware &#8212; documentación de ServiceMatch - 09 de Diciembre, 2024</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=a99a33d2"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=f85f4cfb"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="Settings del Proyecto" href="settings.html" />
+    <link rel="prev" title="Models en el Proyecto ServiceMatch" href="models.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="middleware">
+<h1>Middleware<a class="headerlink" href="#middleware" title="Link to this heading">¶</a></h1>
+<p>Este archivo documenta los middlewares personalizados creados para el proyecto. Los middlewares son utilizados para procesar solicitudes y respuestas globalmente, antes de que lleguen a las vistas o después de que se generen.</p>
+<section id="bloquear-navegacion-middleware">
+<h2>Bloquear Navegación Middleware<a class="headerlink" href="#bloquear-navegacion-middleware" title="Link to this heading">¶</a></h2>
+<p>El middleware <cite>BloquearNavegacionMiddleware</cite> bloquea el acceso a ciertas rutas específicas
+para usuarios no autenticados.</p>
+<p><strong>Ubicación:</strong> <cite>middleware.py</cite></p>
+<p><strong>Propósito:</strong>
+- Restringir rutas relacionadas con la gestión administrativa.
+- Redirigir a la página de inicio de sesión si un usuario no autenticado intenta acceder.</p>
+<p><strong>Código del Middleware:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">redirect</span>
+<span class="kn">from</span> <span class="nn">django.urls</span> <span class="kn">import</span> <span class="n">reverse</span><span class="p">,</span> <span class="n">NoReverseMatch</span>
+
+<span class="k">class</span> <span class="nc">BloquearNavegacionMiddleware</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Middleware para bloquear el acceso a ciertas rutas específicas si el usuario no está autenticado.</span>
+<span class="sd">    </span>
+<span class="sd">    - Bloquea rutas relacionadas con la gestión de profesiones y profesionales.</span>
+<span class="sd">    - Redirige a la página de inicio de sesión si se intenta acceder a estas rutas sin autenticación.</span>
+
+<span class="sd">    Uso:</span>
+<span class="sd">        Añadir &#39;BloquearNavegacionMiddleware&#39; en la lista MIDDLEWARE del archivo settings.py.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_response</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Inicializa el middleware.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            get_response (callable): La función que se encarga de procesar la respuesta.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_response</span> <span class="o">=</span> <span class="n">get_response</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Intercepta las solicitudes entrantes y verifica si el usuario está autorizado para acceder a ciertas rutas.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request (HttpRequest): Objeto de solicitud HTTP.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            HttpResponse: Respuesta procesada o redirección en caso de no autorización.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Lista de rutas específicas que deben estar bloqueadas para usuarios no autenticados.</span>
+        <span class="n">urls_bloqueadas</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Agrega rutas estáticas a la lista de URLs bloqueadas.</span>
+            <span class="n">urls_bloqueadas</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+                <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;admin_home&#39;</span><span class="p">),</span>
+                <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;gestionar_profesion&#39;</span><span class="p">),</span>
+                <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;agregar_profesion&#39;</span><span class="p">),</span>
+                <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;gestionar_profesionales&#39;</span><span class="p">),</span>
+                <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;agregar_profesionales&#39;</span><span class="p">)</span>
+            <span class="p">])</span>
+        <span class="k">except</span> <span class="n">NoReverseMatch</span><span class="p">:</span>
+            <span class="c1"># Ignora rutas que no se puedan resolver en el momento.</span>
+            <span class="k">pass</span>
+        <span class="c1"># Verifica si el usuario está accediendo a rutas dinámicas restringidas.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;actualizar_profesion&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;servicio_id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">or</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;eliminar_profesion&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;servicio_id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">or</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;actualizar_profesional&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;profesional_id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">or</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;eliminar_profesional&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;profesional_id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="p">):</span>
+            <span class="c1"># Redirige al usuario no autenticado a la página de inicio de sesión.</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;login&#39;</span><span class="p">)</span>
+        
+        <span class="c1"># Procesa la respuesta normalmente si no se cumple ninguna condición de bloqueo.</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_response</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+</div>
+<p><strong>Configuración:</strong>
+Para habilitar este middleware, agréguelo a la lista <cite>MIDDLEWARE</cite> en el archivo <cite>settings.py</cite>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MIDDLEWARE</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="o">...</span>
+    <span class="s1">&#39;app.middleware.BloquearNavegacionMiddleware&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">ServiceMatch</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Ir a" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navegación</h3>
+<p class="caption" role="heading"><span class="caption-text">Contenido:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="views.html">Vistas del Proyecto ServiceMatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models en el Proyecto ServiceMatch</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Middleware</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#bloquear-navegacion-middleware">Bloquear Navegación Middleware</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html">Settings del Proyecto</a></li>
+<li class="toctree-l1"><a class="reference internal" href="urls.html">URLs del Proyecto</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="models.html" title="capítulo anterior">Models en el Proyecto ServiceMatch</a></li>
+      <li>Next: <a href="settings.html" title="próximo capítulo">Settings del Proyecto</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Tiffani Bastidas, Francisco Pinol, Raquel Guarda.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/middleware.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

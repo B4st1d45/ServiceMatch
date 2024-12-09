@@ -12,6 +12,18 @@ def es_admin(user):
 
 @user_passes_test(es_admin)
 def gestionar_profesionales(request):
+    """
+    Gestiona la visualización de los profesionales registrados en el sistema.
+
+    Solo los administradores tienen acceso a esta vista. Obtiene todos los profesionales
+    de la base de datos y los pasa al template para su visualización.
+
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+
+    Returns:
+        HttpResponse: Renderiza el template 'gestionar_profesionales.html' con la lista de profesionales.
+    """
     profesionales = Usuario.objects.filter(rol='profesional')
     return render(request, 'app/admin/gestionar_profesionales.html', {
         'profesionales': profesionales, 
@@ -19,6 +31,20 @@ def gestionar_profesionales(request):
     
 @user_passes_test(es_admin)
 def agregar_profesional(request):
+    """
+    Permite agregar un nuevo profesional al sistema.
+
+    Solo los administradores pueden agregar profesionales. Los datos del nuevo profesional
+    se reciben por POST. Valida que los campos sean correctos y que no haya duplicados en
+    los campos de email y RUT. Si todo es válido, se guarda el nuevo profesional en la base de datos.
+
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+
+    Returns:
+        HttpResponse: Renderiza el template 'agregar_profesionales.html' si es GET o redirige
+                      a 'gestionar_profesionales' si la operación de POST es exitosa.
+    """
     print("Vista 'agregar_profesional' ejecutándose.")
     if request.method == 'POST':
         print("Método POST recibido. Datos:", request.POST)
@@ -68,6 +94,21 @@ def agregar_profesional(request):
 
 @user_passes_test(es_admin)
 def actualizar_profesional(request, profesional_id):
+    """
+    Permite actualizar los datos de un profesional en el sistema.
+
+    Solo los administradores pueden actualizar los datos de los profesionales. Los datos
+    actualizados se reciben por POST y se validan para evitar duplicados de email y RUT.
+    Si la operación es exitosa, el profesional se actualiza en la base de datos.
+
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+        profesional_id (int): ID del profesional a actualizar.
+
+    Returns:
+        HttpResponse: Renderiza el template 'actualizar_profesional.html' si es GET o redirige
+                      a 'gestionar_profesionales' si la operación de POST es exitosa.
+    """
     usuario = get_object_or_404(Usuario, id=profesional_id)
 
     if request.method == 'POST':
@@ -115,6 +156,20 @@ def actualizar_profesional(request, profesional_id):
 
 @user_passes_test(es_admin)
 def eliminar_profesional(request, profesional_id):
+    """
+    Permite eliminar un profesional del sistema.
+
+    Solo los administradores pueden eliminar profesionales. La operación de eliminación
+    se realiza solo si el método de solicitud es POST.
+
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+        profesional_id (int): ID del profesional a eliminar.
+
+    Returns:
+        HttpResponse: Renderiza el template 'eliminar_profesional.html' si es GET o redirige
+                      a 'gestionar_profesionales' si la operación de eliminación es exitosa.
+    """
     usuario = get_object_or_404(Usuario, id=profesional_id)
     if request.method == 'POST':
         usuario.delete()

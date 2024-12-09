@@ -11,6 +11,19 @@ def es_admin(user):
 
 @user_passes_test(es_admin)
 def obtener_estadisticas_reservas(request):
+    """
+    Genera estadísticas de reservas agrupadas por mes y estado.
+
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+
+    Returns:
+        JsonResponse: Datos de reservas organizados por estado y mes:
+            - completadas: Lista con el número de reservas completadas por mes.
+            - pendientes: Lista con el número de reservas pendientes por mes.
+            - canceladas: Lista con el número de reservas canceladas por mes.
+            - meses: Lista de los nombres de los meses en orden cronológico.
+    """
     reservas_por_mes = Reserva.objects.values('fecha__month', 'estado').annotate(cantidad=Count('id')).order_by('fecha__month')
     data = {
         'completadas': [0] * 12,
@@ -31,8 +44,23 @@ def obtener_estadisticas_reservas(request):
             
     return JsonResponse(data)
 
+
 @user_passes_test(es_admin)
 def obtener_estadisticas_tarjetas(request):
+    """
+    Calcula y retorna estadísticas generales para la vista administrativa.
+
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+
+    Returns:
+        JsonResponse: Datos de estadísticas generales:
+            - total_reservas: Total de reservas realizadas.
+            - reservas_completadas: Número de reservas completadas.
+            - total_usuarios: Número de usuarios registrados.
+            - promedio_mensual: Promedio mensual de ganancias.
+            - ganancias: Total de ganancias generadas por reservas completadas.
+    """
     total_reservas = Reserva.objects.count()
     reservas_completadas = Reserva.objects.filter(estado='completada').count()
     total_usuarios = Usuario.objects.count()  

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+
+<html lang="es" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>app.views.gestionProfesion_views &#8212; documentación de ServiceMatch - 09 de diciembre, 2024</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../../_static/documentation_options.js?v=bf1a0fe4"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/translations.js?v=f85f4cfb"></script>
+    <link rel="index" title="Índice" href="../../../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Código fuente para app.views.gestionProfesion_views</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">redirect</span>
+<span class="kn">from</span> <span class="nn">app.models</span> <span class="kn">import</span> <span class="n">Servicio</span><span class="p">,</span> <span class="n">Reserva</span><span class="p">,</span> <span class="n">Subcategoria</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">get_object_or_404</span><span class="p">,</span> <span class="n">redirect</span>
+<span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">messages</span>
+<span class="kn">from</span> <span class="nn">django.core.exceptions</span> <span class="kn">import</span> <span class="n">ValidationError</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">user_passes_test</span>
+<span class="kn">from</span> <span class="nn">django.core.exceptions</span> <span class="kn">import</span> <span class="n">PermissionDenied</span>
+
+<span class="k">def</span> <span class="nf">es_admin</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">raise</span> <span class="n">PermissionDenied</span>
+
+<div class="viewcode-block" id="gestionar_profesion">
+<a class="viewcode-back" href="../../../views.html#app.views.gestionProfesion_views.gestionar_profesion">[documentos]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">es_admin</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">gestionar_profesion</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Muestra una lista de servicios disponibles para la administración.</span>
+
+<span class="sd">    Solo los usuarios con permisos de administrador pueden acceder a esta vista.</span>
+<span class="sd">    Se muestra una lista con todos los servicios registrados en el sistema.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request (HttpRequest): Objeto de solicitud HTTP que contiene los datos de la solicitud.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HttpResponse: Renderiza la plantilla &#39;gestionar_profesion.html&#39; con la lista de servicios.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">servicios</span> <span class="o">=</span> <span class="n">Servicio</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;app/admin/gestionar_profesion.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;servicios&#39;</span><span class="p">:</span> <span class="n">servicios</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="agregar_profesion">
+<a class="viewcode-back" href="../../../views.html#app.views.gestionProfesion_views.agregar_profesion">[documentos]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">es_admin</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">agregar_profesion</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Permite agregar un nuevo servicio y sus subcategorías asociadas.</span>
+
+<span class="sd">    Solo los usuarios con permisos de administrador pueden acceder a esta vista.</span>
+<span class="sd">    Se debe ingresar un nombre para el servicio y luego las subcategorías correspondientes.</span>
+<span class="sd">    Si algún dato de las subcategorías es incompleto, se muestra un mensaje de error.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request (HttpRequest): Objeto de solicitud HTTP que contiene los datos del formulario.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HttpResponse: Redirige a la vista de gestión de profesiones después de agregar el servicio.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">nombre</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;nombre&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">nombre</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;El nombre del servicio es obligatorio.&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;agregar_profesion&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Crear el servicio</span>
+        <span class="n">nuevo_servicio</span> <span class="o">=</span> <span class="n">Servicio</span><span class="p">(</span><span class="n">nombre</span><span class="o">=</span><span class="n">nombre</span><span class="p">)</span>
+        <span class="n">nuevo_servicio</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="c1"># Crear subcategorías</span>
+        <span class="n">subcategorias_nombres</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;subcategoria_nombre[]&#39;</span><span class="p">)</span>
+        <span class="n">subcategorias_precios</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;subcategoria_precio[]&#39;</span><span class="p">)</span>
+        <span class="n">subcategorias_duraciones</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;subcategoria_duracion[]&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">precio</span><span class="p">,</span> <span class="n">duracion</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">subcategorias_nombres</span><span class="p">,</span> <span class="n">subcategorias_precios</span><span class="p">,</span> <span class="n">subcategorias_duraciones</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">nombre</span> <span class="ow">and</span> <span class="n">precio</span> <span class="ow">and</span> <span class="n">duracion</span><span class="p">:</span>
+                <span class="n">Subcategoria</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                    <span class="n">servicio</span><span class="o">=</span><span class="n">nuevo_servicio</span><span class="p">,</span>
+                    <span class="n">nombre</span><span class="o">=</span><span class="n">nombre</span><span class="p">,</span>
+                    <span class="n">precio_base</span><span class="o">=</span><span class="n">precio</span><span class="p">,</span>
+                    <span class="n">duracion_estimada</span><span class="o">=</span><span class="n">duracion</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Datos incompletos para subcategoría </span><span class="si">{</span><span class="n">nombre</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;Servicio y subcategorías añadidos exitosamente.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;gestionar_profesion&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;app/admin/agregar_profesion.html&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="validar_subcategoria">
+<a class="viewcode-back" href="../../../views.html#app.views.gestionProfesion_views.validar_subcategoria">[documentos]</a>
+<span class="k">def</span> <span class="nf">validar_subcategoria</span><span class="p">(</span><span class="n">nombre</span><span class="p">,</span> <span class="n">precio</span><span class="p">,</span> <span class="n">duracion</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Valida los datos de una subcategoría.</span>
+
+<span class="sd">    Verifica que todos los campos de la subcategoría sean válidos. El precio debe ser un número decimal y</span>
+<span class="sd">    la duración debe ser un número entero. También verifica que todos los campos estén presentes.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        nombre (str): Nombre de la subcategoría.</span>
+<span class="sd">        precio (str): Precio base de la subcategoría.</span>
+<span class="sd">        duracion (str): Duración estimada de la subcategoría.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: Una tupla con un valor booleano que indica si la validación fue exitosa y un mensaje</span>
+<span class="sd">               que describe el resultado de la validación.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Valida los datos de una subcategoría.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">nombre</span> <span class="ow">and</span> <span class="n">precio</span> <span class="ow">and</span> <span class="n">duracion</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Faltan datos obligatorios.&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">precio</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">precio</span><span class="p">)</span>
+        <span class="n">duracion</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">duracion</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;Validación exitosa&quot;</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Precio o duración inválidos.&quot;</span></div>
+
+
+<div class="viewcode-block" id="actualizar_profesion">
+<a class="viewcode-back" href="../../../views.html#app.views.gestionProfesion_views.actualizar_profesion">[documentos]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">es_admin</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">actualizar_profesion</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">servicio_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Permite actualizar un servicio y sus subcategorías asociadas.</span>
+
+<span class="sd">    Solo los usuarios con permisos de administrador pueden acceder a esta vista.</span>
+<span class="sd">    Se pueden actualizar el nombre del servicio, las subcategorías existentes, eliminar subcategorías y agregar nuevas subcategorías.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request (HttpRequest): Objeto de solicitud HTTP que contiene los datos del formulario.</span>
+<span class="sd">        servicio_id (int): ID del servicio que se desea actualizar.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HttpResponse: Renderiza la plantilla &#39;actualizar_profesion.html&#39; con el servicio y sus subcategorías.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">servicio</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Servicio</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">servicio_id</span><span class="p">)</span>
+    <span class="n">subcategorias_existentes</span> <span class="o">=</span> <span class="n">servicio</span><span class="o">.</span><span class="n">subcategorias</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="n">todas_las_subcategorias</span> <span class="o">=</span> <span class="n">Subcategoria</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">servicio</span><span class="o">.</span><span class="n">nombre</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;nombre&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">servicio</span><span class="o">.</span><span class="n">nombre</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;El nombre del servicio es obligatorio.&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;actualizar_profesion&#39;</span><span class="p">,</span> <span class="n">servicio_id</span><span class="o">=</span><span class="n">servicio_id</span><span class="p">)</span>
+        <span class="n">servicio</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+         <span class="c1"># Validar y actualizar subcategorías existentes</span>
+        <span class="k">for</span> <span class="n">subcategoria</span> <span class="ow">in</span> <span class="n">servicio</span><span class="o">.</span><span class="n">subcategorias</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="n">subcategoria_nombre</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;nombre_</span><span class="si">{</span><span class="n">subcategoria</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">subcategoria_precio</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;precio_</span><span class="si">{</span><span class="n">subcategoria</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">subcategoria_duracion</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;duracion_</span><span class="si">{</span><span class="n">subcategoria</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="n">valido</span><span class="p">,</span> <span class="n">mensaje</span> <span class="o">=</span> <span class="n">validar_subcategoria</span><span class="p">(</span><span class="n">subcategoria_nombre</span><span class="p">,</span> <span class="n">subcategoria_precio</span><span class="p">,</span> <span class="n">subcategoria_duracion</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">valido</span><span class="p">:</span>
+                <span class="n">subcategoria</span><span class="o">.</span><span class="n">nombre</span> <span class="o">=</span> <span class="n">subcategoria_nombre</span>
+                <span class="n">subcategoria</span><span class="o">.</span><span class="n">precio_base</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">subcategoria_precio</span><span class="p">)</span>
+                <span class="n">subcategoria</span><span class="o">.</span><span class="n">duracion_estimada</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">subcategoria_duracion</span><span class="p">)</span>
+                <span class="n">subcategoria</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Error en subcategoría &#39;</span><span class="si">{</span><span class="n">subcategoria</span><span class="o">.</span><span class="n">nombre</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">mensaje</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Eliminar subcategorías seleccionadas</span>
+        <span class="n">subcategorias_a_eliminar</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;eliminar_subcategoria&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">subcategorias_a_eliminar</span><span class="p">:</span>
+            <span class="n">servicio</span><span class="o">.</span><span class="n">subcategorias</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">id__in</span><span class="o">=</span><span class="n">subcategorias_a_eliminar</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+
+        <span class="c1"># Agregar nuevas subcategorías al servicio</span>
+        <span class="n">nuevas_nombres</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;nueva_subcategoria_nombre&#39;</span><span class="p">)</span>
+        <span class="n">nuevas_precios</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;nueva_subcategoria_precio&#39;</span><span class="p">)</span>
+        <span class="n">nuevas_duraciones</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;nueva_subcategoria_duracion&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">precio</span><span class="p">,</span> <span class="n">duracion</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">nuevas_nombres</span><span class="p">,</span> <span class="n">nuevas_precios</span><span class="p">,</span> <span class="n">nuevas_duraciones</span><span class="p">):</span>
+            <span class="n">valido</span><span class="p">,</span> <span class="n">mensaje</span> <span class="o">=</span> <span class="n">validar_subcategoria</span><span class="p">(</span><span class="n">nombre</span><span class="p">,</span> <span class="n">precio</span><span class="p">,</span> <span class="n">duracion</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">valido</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">servicio</span><span class="o">.</span><span class="n">subcategorias</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">nombre</span><span class="o">=</span><span class="n">nombre</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;La subcategoría &#39;</span><span class="si">{</span><span class="n">nombre</span><span class="si">}</span><span class="s2">&#39; ya existe en este servicio.&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">nueva_subcategoria</span> <span class="o">=</span> <span class="n">Subcategoria</span><span class="p">(</span>
+                        <span class="n">servicio</span><span class="o">=</span><span class="n">servicio</span><span class="p">,</span>
+                        <span class="n">nombre</span><span class="o">=</span><span class="n">nombre</span><span class="p">,</span>
+                        <span class="n">precio_base</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">precio</span><span class="p">),</span>
+                        <span class="n">duracion_estimada</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">duracion</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">nueva_subcategoria</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Error al agregar nueva subcategoría: </span><span class="si">{</span><span class="n">mensaje</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;Servicio actualizado con éxito.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;gestionar_profesion&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;app/admin/actualizar_profesion.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s1">&#39;servicio&#39;</span><span class="p">:</span> <span class="n">servicio</span><span class="p">,</span> 
+        <span class="s1">&#39;subcategorias_existentes&#39;</span><span class="p">:</span> <span class="n">subcategorias_existentes</span><span class="p">,</span>
+        <span class="s1">&#39;todas_las_subcategorias&#39;</span><span class="p">:</span> <span class="n">todas_las_subcategorias</span><span class="p">,</span>
+        <span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="eliminar_profesion">
+<a class="viewcode-back" href="../../../views.html#app.views.gestionProfesion_views.eliminar_profesion">[documentos]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">es_admin</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">eliminar_profesion</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">servicio_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Permite eliminar un servicio del sistema.</span>
+
+<span class="sd">    Solo los usuarios con permisos de administrador pueden acceder a esta vista.</span>
+<span class="sd">    Esta vista muestra un mensaje de confirmación antes de eliminar el servicio.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request (HttpRequest): Objeto de solicitud HTTP que contiene la confirmación de eliminación.</span>
+<span class="sd">        servicio_id (int): ID del servicio que se desea eliminar.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HttpResponse: Redirige a la vista de gestión de profesiones después de eliminar el servicio.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">servicio</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Servicio</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">servicio_id</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">servicio</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;Servicio eliminado exitosamente.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;gestionar_profesion&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;app/admin/confirmar_eliminacion.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;servicio&#39;</span><span class="p">:</span> <span class="n">servicio</span><span class="p">})</span></div>
+
+
+
+<span class="c1"># validaciones para hacer una reserva exitosa</span>
+<div class="viewcode-block" id="validar_disponibilidad">
+<a class="viewcode-back" href="../../../views.html#app.views.gestionProfesion_views.validar_disponibilidad">[documentos]</a>
+<span class="k">def</span> <span class="nf">validar_disponibilidad</span><span class="p">(</span><span class="n">profesional</span><span class="p">,</span> <span class="n">fecha</span><span class="p">,</span> <span class="n">hora</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Verifica la disponibilidad de un profesional para una reserva en una fecha y hora específicas.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        profesional (Profesional): El profesional que se está verificando.</span>
+<span class="sd">        fecha (date): La fecha en la que se quiere hacer la reserva.</span>
+<span class="sd">        hora (time): La hora en la que se quiere hacer la reserva.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValidationError: Si el horario de la reserva no está disponible o si el profesional ya tiene una reserva en ese horario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fecha_hora_reserva</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">fecha</span><span class="p">,</span> <span class="n">hora</span><span class="p">)</span>
+    <span class="n">rango_horario_inicio</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">profesional</span><span class="o">.</span><span class="n">horario_inicio</span><span class="p">,</span> <span class="s1">&#39;%H:%M&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">rango_horario_fin</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">profesional</span><span class="o">.</span><span class="n">horario_fin</span><span class="p">,</span> <span class="s1">&#39;%H:%M&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">reservas</span> <span class="o">=</span> <span class="n">Reserva</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">profesional</span><span class="o">=</span><span class="n">profesional</span><span class="p">,</span> <span class="n">fecha</span><span class="o">=</span><span class="n">fecha</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">rango_horario_inicio</span> <span class="o">&lt;=</span> <span class="n">hora</span> <span class="o">&lt;=</span> <span class="n">rango_horario_fin</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;El horario de la reserva está fuera del rango permitido.&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">reserva</span> <span class="ow">in</span> <span class="n">reservas</span><span class="p">:</span>
+        <span class="n">reserva_fecha_hora</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">reserva</span><span class="o">.</span><span class="n">fecha</span><span class="p">,</span> <span class="n">reserva</span><span class="o">.</span><span class="n">hora</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">((</span><span class="n">reserva_fecha_hora</span> <span class="o">-</span> <span class="n">fecha_hora_reserva</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mi">3600</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;El profesional ya tiene una reserva en este horario.&quot;</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="validar_dia_habil">
+<a class="viewcode-back" href="../../../views.html#app.views.gestionProfesion_views.validar_dia_habil">[documentos]</a>
+<span class="k">def</span> <span class="nf">validar_dia_habil</span><span class="p">(</span><span class="n">fecha</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Valida si la fecha de la reserva corresponde a un día hábil (lunes a viernes).</span>
+
+<span class="sd">    Si la fecha corresponde a un sábado o domingo, se genera un error indicando que</span>
+<span class="sd">    solo se puede realizar reservas de lunes a viernes.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fecha (date): La fecha de la reserva a validar.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValidationError: Si la fecha corresponde a un sábado o domingo.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fecha</span><span class="o">.</span><span class="n">weekday</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">:</span>  <span class="c1"># 5 = Sábado, 6 = Domingo</span>
+        <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;Solo puedes reservar de lunes a viernes.&quot;</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="validar_fecha_futura">
+<a class="viewcode-back" href="../../../views.html#app.views.gestionProfesion_views.validar_fecha_futura">[documentos]</a>
+<span class="k">def</span> <span class="nf">validar_fecha_futura</span><span class="p">(</span><span class="n">fecha</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Valida si la fecha de la reserva es futura y tiene al menos 24 horas de anticipación.</span>
+
+<span class="sd">    Compara la fecha de la reserva con la fecha actual. Si la fecha es pasada o no cumple con</span>
+<span class="sd">    el requisito de al menos 24 horas de anticipación, se genera un error.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fecha (date): La fecha de la reserva a validar.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValidationError: Si la fecha es pasada o no cumple con el requisito de 24 horas de anticipación.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">hoy</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">fecha</span> <span class="o">&lt;=</span> <span class="n">hoy</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;La reserva debe ser para una fecha futura.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fecha</span> <span class="o">-</span> <span class="n">hoy</span> <span class="o">&lt;</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;La reserva debe hacerse con al menos 24 horas de anticipación.&quot;</span><span class="p">)</span></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">ServiceMatch</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Ir a" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navegación</h3>
+<p class="caption" role="heading"><span class="caption-text">Contenido:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../views.html">Vistas del Proyecto ServiceMatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">Models en el Proyecto ServiceMatch</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Código de módulo</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Tiffani Bastidas.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

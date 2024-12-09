@@ -9,9 +9,21 @@ from django.http import JsonResponse
 from django.db.models import Avg
 from decimal import Decimal
 
-
 @login_required
 def crear_reserva(request):
+    """
+    Permite a los usuarios crear una nueva reserva.
+
+    - Verifica si el cliente ya tiene alguna reserva.
+    - Aplica un descuento del 20% en la tarifa del servicio si es la primera reserva del cliente.
+    - Redirige al usuario para confirmar el pago de la reserva.
+
+    Args:
+        request (HttpRequest): Solicitud HTTP.
+
+    Returns:
+        HttpResponse: Redirige al usuario a la página de confirmación de pago o muestra un error.
+    """
     if request.method == 'POST':
         subcategoria_id = request.POST.get('subcategoria')
         profesional_id = request.POST.get('profesional')
@@ -61,8 +73,6 @@ def crear_reserva(request):
             'precio_servicio': 0,
         })
 
-
-
 def reservas_json(request):
     reservas = Reserva.objects.all()
     eventos = []
@@ -79,6 +89,15 @@ def reservas_json(request):
 
 @login_required
 def ver_mis_reservas(request):
+    """
+    Muestra las reservas del usuario (cliente).
+
+    Args:
+        request (HttpRequest): Solicitud HTTP.
+
+    Returns:
+        HttpResponse: Renderiza el template 'ver_mis_reservas.html' con las reservas del usuario.
+    """
     reservas = Reserva.objects.filter(usuario=request.user)
     return render(request, 'app/cliente/ver_mis_reservas.html', {
         'reservas': reservas,
@@ -86,6 +105,16 @@ def ver_mis_reservas(request):
 
 @login_required
 def eliminar_reserva(request, reserva_id):
+    """
+    Permite al usuario eliminar una reserva previamente creada.
+
+    Args:
+        request (HttpRequest): Solicitud HTTP.
+        reserva_id (int): ID de la reserva a eliminar.
+
+    Returns:
+        HttpResponse: Redirige a la lista de reservas o muestra una confirmación de eliminación.
+    """
     reserva = get_object_or_404(Reserva, id=reserva_id, usuario=request.user)
     if request.method == 'POST':
         reserva.delete()
@@ -94,11 +123,33 @@ def eliminar_reserva(request, reserva_id):
     return render(request, 'app//cliente/eliminar_reserva.html', {'reserva': reserva})
 
 def reservas_totales(request):
+    """
+    Muestra todas las reservas del sistema en el panel de administración.
+
+    Args:
+        request (HttpRequest): Solicitud HTTP.
+
+    Returns:
+        HttpResponse: Renderiza el template 'reservas_totales.html' con todas las reservas.
+    """
     reservas = Reserva.objects.select_related('profesional', 'usuario').all()
     return render(request, 'app/admin/reservas_totales.html', {'reservas': reservas})
 
 @login_required
 def confirmar_pago(request, reserva_id):
+    """
+    Permite al usuario confirmar el pago de una reserva.
+
+    - Cambia el estado de la reserva a 'pendiente' después del pago.
+    - Muestra un mensaje de éxito y redirige al usuario a sus reservas.
+
+    Args:
+        request (HttpRequest): Solicitud HTTP.
+        reserva_id (int): ID de la reserva a confirmar.
+
+    Returns:
+        HttpResponse: Renderiza la página de confirmación de pago o redirige tras la confirmación.
+    """
     reserva = get_object_or_404(Reserva, id=reserva_id, usuario=request.user)
     
     if request.method == 'POST':
@@ -110,9 +161,18 @@ def confirmar_pago(request, reserva_id):
         'reserva': reserva,
     })
     
-
 @login_required
 def resena_profesional(request, profesional_id):
+    """
+    Muestra las reseñas de un profesional específico.
+
+    Args:
+        request (HttpRequest): Solicitud HTTP.
+        profesional_id (int): ID del profesional.
+
+    Returns:
+        HttpResponse: Renderiza el template 'reseña.html' con las reseñas del profesional.
+    """
     profesional = get_object_or_404(Usuario, id=profesional_id, rol='profesional')
     reseñas = Reseña.objects.filter(profesional=profesional).order_by('-fecha')
     return render(request, 'app/reserva/reseña.html', {

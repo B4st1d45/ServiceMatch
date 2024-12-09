@@ -1,0 +1,45 @@
+serviceMatch package
+====================
+
+Submodules
+----------
+
+serviceMatch.asgi module
+------------------------
+
+.. automodule:: serviceMatch.asgi
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+serviceMatch.settings module
+----------------------------
+
+.. automodule:: serviceMatch.settings
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+serviceMatch.urls module
+------------------------
+
+.. automodule:: serviceMatch.urls
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+serviceMatch.wsgi module
+------------------------
+
+.. automodule:: serviceMatch.wsgi
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: serviceMatch
+   :members:
+   :undoc-members:
+   :show-inheritance:
